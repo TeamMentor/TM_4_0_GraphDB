@@ -36,7 +36,7 @@ describe '| api | base-classes | Swagger-GraphDB.test |', ->
       @.swaggerService.assert_Is options.swaggerService
 
   it 'close_Import_Service_and_Send', (done)->
-    temp_Data     = 'data_'.add_5_Letters()
+    temp_Data     = {article_Id:'data_'.add_5_Letters()}
     temp_Key      = 'key_'.add_5_Letters()
     importService =
       graph:
@@ -44,8 +44,8 @@ describe '| api | base-classes | Swagger-GraphDB.test |', ->
           callback()
     res =
       send: (data)=>
-        data.assert_Is (temp_Data.json_Str())
-        tmp_Cache.get(temp_Key).assert_Is temp_Data
+        data.json_Parse().json_Str().assert_Is (temp_Data.json_Str())
+        tmp_Cache.get(temp_Key).json_Parse().json_Str().assert_Is (temp_Data.json_Str())
         done()
 
     options =
@@ -104,13 +104,43 @@ describe '| api | base-classes | Swagger-GraphDB.test | open_Import_Service', ->
 
   it 'sending data not in cache', (done)->
 
-    temp_Data     = 'data_'.add_5_Letters()
+    temp_Data     = {article_Id:'data_'.add_5_Letters()}
     temp_Key      = 'key_'.add_5_Letters()
 
     res =
       send: (data)=>
-        data                   .assert_Is temp_Data.json_Str()
-        tmp_Cache.get(temp_Key).assert_Is temp_Data
+        data.json_Parse().json_Str().assert_Is(temp_Data.json_Str())
+        tmp_Cache.get(temp_Key).json_Parse().json_Str().assert_Is (temp_Data.json_Str())
+        done()
+
+    swagger_DB.open_Import_Service res, temp_Key, (_importService)->
+      importService = _importService
+      swagger_DB.close_Import_Service_and_Send importService, res, temp_Data, temp_Key
+
+  it 'Invalid articles should not be created in cache', (done)->
+
+    temp_Data     = 'data_'.add_5_Letters()
+    temp_Key      = 'key_'.add_Random_Letters (1000);
+
+    res =
+      send: (data)=>
+        data.json_Parse().json_Str().assert_Is(temp_Data.json_Str())
+        tmp_Cache.has_Key(temp_Key).assert_Is_False()
+        done()
+
+    swagger_DB.open_Import_Service res, temp_Key, (_importService)->
+      importService = _importService
+      swagger_DB.close_Import_Service_and_Send importService, res, temp_Data, temp_Key
+
+  it 'Invalid articles (NULL) should not be created in cache', (done)->
+
+    temp_Data     = undefined
+    temp_Key      = 'key_'.add_Random_Letters (1000);
+
+    res =
+      send: (data)=>
+        data?.assert_Is_Undefined()
+        tmp_Cache.has_Key(temp_Key).assert_Is_False()
         done()
 
     swagger_DB.open_Import_Service res, temp_Key, (_importService)->

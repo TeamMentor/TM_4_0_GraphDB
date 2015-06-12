@@ -45,6 +45,7 @@
     "jade": "latest",
     "jscreole": "latest",
     "jsdom": "3.1.2",
+    "level": "^1.1.0",
     "levelgraph": "latest",
     "markdown-it": "latest",
     "node-uuid": "latest",

@@ -5,10 +5,11 @@ loaded_Raw_Articles_Html      = null
 class Article
 
   constructor: (importService)->
-    @.importService  = importService || new Import_Service(name:'tm-uno')
+    @.importService       = importService || new Import_Service(name:'tm-uno')
+    @.folder_Lib_UNO_Json = global.config?.tm_graph?.folder_Lib_UNO_Json
 
   folder_Articles_Html: ()=>
-    __dirname.path_Combine "../../.tmCache/Lib_UNO-json/Articles_Html"
+    @.folder_Lib_UNO_Json?.path_Combine 'Articles_Html'
 
   article_Id_To_Guid: (article_Id, callback)=>
     @.importService.graph_Find.get_Subject_Data article_Id, (article_Data)=>

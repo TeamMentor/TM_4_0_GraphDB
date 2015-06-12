@@ -15,11 +15,11 @@ describe '| services | graph | Graph-Service.test |', ->
 
       using new Graph_Service(name: 'aaaa'),->
         @.dbName.assert_Is 'aaaa'
-        @.dbPath.assert_Is './.tmCache/aaaa'
+        @.dbPath.assert_Is '.tmCache/aaaa'
         @.dbPath.folder_Delete_Recursive().assert_Is_True()
 
     it 'openDb and closeDb', (done)->
-      graphService  = new Graph_Service()
+      graphService  = new Graph_Service(name: 'aaaa')
 
       expect(graphService.openDb).to.be.an('function')
       expect(graphService.closeDb).to.be.an('function')
@@ -57,7 +57,7 @@ describe '| services | graph | Graph-Service.test |', ->
     it '@.ensure_TM_Uno_Is_Loaded', (done)->
       @.timeout 30000
       using new Graph_Service(name:'tm-uno'),->
-        @.openDb => #this will trigger @.ensure_TM_Uno_Is_Loaded =>
+        @.openDb =>                               # this will trigger @.ensure_TM_Uno_Is_Loaded
           @.allData (data)=>
             data.assert_Size_Is_Bigger_Than 20000
             @.closeDb ->

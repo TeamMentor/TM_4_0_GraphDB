@@ -13,12 +13,13 @@ class Search_Text_Service
 
   constructor: (options)->
     @.dependencies()
-    @.options            = options || {}
-    @.importService      = @.options.importService
-    @.cache_Search       = new Cache_Service("search_cache")
+    @.options             = options || {}
+    @.importService       = @.options.importService
+    @.cache_Search        = new Cache_Service("search_cache")
+    @.folder_Lib_UNO_Json = global.config?.tm_graph?.folder_Lib_UNO_Json
 
   folder_Search_Data: ()=>
-    __dirname.path_Combine "../../../.tmCache/Lib_UNO-json/Search_Data"
+    @.folder_Lib_UNO_Json.path_Combine 'Search_Data'
 
 
   search_Mappings: (callback)=>

@@ -1,3 +1,4 @@
+levelup         = null
 levelgraph      = null
 GitHub_Service  = null
 async           = require 'async'
@@ -8,17 +9,21 @@ class Graph_Service
   locked = false
 
   dependencies: ->
+    levelup           = require 'level'
     levelgraph        = require 'levelgraph'
     {GitHub_Service}  = require 'teammentor'
 
   constructor: (options)->
     @.dependencies()
-    @.options       = options || {}
-    @.dbName        = @.options.name || '_tmp_db'.add_Random_String(5)
-    @.dbPath        = "./.tmCache/#{@dbName}"
-    @.db            = null
-    @.db_Lock_Tries = @.options.db_Lock_Tries || 20
-    @.db_Lock_Delay = @.options.db_Lock_Delay || 250
+    @.options         = options || {}
+    @.dbName          = @.options.name || '_tmp_db'.add_Random_String(5)
+    @.tmCache         = './.tmCache'
+    @.dbPath          = @.tmCache.path_Combine @dbName
+    @.lib_Loaded_Flag = "#{@.tmCache}/tm-uno-loaded.flag"
+    @.lib_UNO_Json    = global.config?.tm_graph?.folder_Lib_UNO_Json
+    @.db              = null
+    @.db_Lock_Tries   = @.options.db_Lock_Tries || 20
+    @.db_Lock_Delay   = @.options.db_Lock_Delay || 250
 
   openDb : (callback)=>
     if locked
@@ -29,7 +34,7 @@ class Graph_Service
       locked = true
       process.nextTick =>
         @.ensure_TM_Uno_Is_Loaded =>
-          @.db = levelgraph(@dbPath)
+          @.db = levelgraph(levelup(@dbPath))
           process.nextTick =>
             callback true
 
@@ -82,28 +87,29 @@ class Graph_Service
       callback()
 
   ensure_TM_Uno_Is_Loaded: (callback)=>
-    path_To_Lib_Uno_Flag = __dirname.path_Combine "..#{path.sep}..#{path.sep}..#{path.sep}"
-                                    .path_Combine ".tmCache#{path.sep}tm-uno-loaded.flag"
-    path_To_Lib_Uno_Json = __dirname.path_Combine "..#{path.sep}..#{path.sep}..#{path.sep}"
-                                    .path_Combine ".tmCache#{path.sep}Lib_UNO-json#{path.sep}Graph_Data"
-    if path_To_Lib_Uno_Json.folder_Not_Exists()
-      path_To_Lib_Uno_Json = ".tmCache#{path.sep}Lib_UNO-json#{path.sep}Graph_Data"
+    @.dbPath.create_Dir()                   # ensure folder exists
+    if @.dbName isnt 'tm-uno'               # to-do: this tm-uno code needs to be refactored into another class
+      return callback()
+    path_Lib_Uno_Flag = @.lib_Loaded_Flag
+    path_Lib_Uno_Json = @.lib_UNO_Json
+    path_Graph_data   = @.lib_UNO_Json.path_Combine('Graph_Data')
 
-    log "[ensure_TM_Uno_Is_Loaded] Using path_To_Lib_Uno_Json: #{path_To_Lib_Uno_Json}"
-    if path_To_Lib_Uno_Json.folder_Not_Exists()
-      log "[ensure_TM_Uno_Is_Loaded] ERROR: Lib_Uno-json folder not found : #{path_To_Lib_Uno_Json}"
+    log "[ensure_TM_Uno_Is_Loaded] Using path_To_Lib_Uno_Json: #{path_Lib_Uno_Json}"
+    if path_Lib_Uno_Json.folder_Not_Exists()
+      log "[ensure_TM_Uno_Is_Loaded] ERROR: Lib_Uno-json folder not found : #{path_Lib_Uno_Json}"
       return callback()
 
-    if path_To_Lib_Uno_Flag.file_Exists()
+    if path_Lib_Uno_Flag.file_Exists()
       return callback()
-    "[ensure_TM_Uno_Is_Loaded] #{path_To_Lib_Uno_Flag.file_Name()} file doesn't exist, so deleting GraphDB and re-importing Lib_Uno-Json data".log()
+
+    "[ensure_TM_Uno_Is_Loaded] #{path_Lib_Uno_Flag.file_Name()} file doesn't exist, so deleting GraphDB and re-importing Lib_Uno-Json data".log()
 
     @.deleteDb =>
       '[ensure_TM_Uno_Is_Loaded] deleting data_cache and search_cache folders'.log()
-      path_To_Lib_Uno_Json.path_Combine('../../data_cache').folder_Delete_Recursive()
-      path_To_Lib_Uno_Json.path_Combine('../../search_cache').folder_Delete_Recursive()
+      "#{@.tmCache}/data_cache".folder_Delete_Recursive()
+      "#{@.tmCache}/search_cache".folder_Delete_Recursive()
 
-      @.db = levelgraph(@.dbPath)                # needs to be done direcly since ensure_TM_Uno_Is_Loaded is part of the openDb code
+      @.db = levelgraph(levelup(@.dbPath))                # needs to be done direcly since ensure_TM_Uno_Is_Loaded is part of the openDb code
 
       console.time('graph import')
       import_Data = (file, callback)=>
@@ -113,8 +119,9 @@ class Graph_Service
 
         async.each graph_Data, @.db.put, callback
 
-      async.each path_To_Lib_Uno_Json.files(), import_Data , =>
-        "[ensure_TM_Uno_Is_Loaded] Data loaded at #{new Date()}".log().save_As path_To_Lib_Uno_Flag
+
+      async.each path_Graph_data.files(), import_Data , =>
+        "[ensure_TM_Uno_Is_Loaded] Data loaded at #{new Date()}".log().save_As path_Lib_Uno_Flag
         console.timeEnd('graph import')
 
         @.closeDb =>                              # seems need to make sure all data is synced

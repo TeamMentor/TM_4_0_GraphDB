@@ -3,6 +3,24 @@
 
 require('coffee-script/register');              // adding coffee-script support
 
+
+process.env.TM_SITE_DATA = "SiteData_TM";
+
+var Side_Data = require('../TM_Shared/src/Site-Data');
+var site_Data = new Side_Data()
+
+log('[SiteData] loading data from ' + site_Data.siteData_Folder())
+
+global.config = site_Data.load_Custom_Code()
+  .load_Options()
+
+log('------------global.config---------------')
+log(global.config);
+log('----------------------------------------')
+
+
+
+
 var Server = require('./src/TM-Server');           // gets the express server
 
 var server = new Server().configure().start()      // configure and start server

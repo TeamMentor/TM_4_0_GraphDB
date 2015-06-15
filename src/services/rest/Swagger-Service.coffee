@@ -20,7 +20,7 @@ class Swagger_Service
     @.app          = @.options.app || express()
     @.apiInfo      = @.options.apiInfo || apiInfo
     @.swagger      = null
-    @.port         = @.options.port || 1332
+    @.port         = @.options.port || global.config?.tm_graph?.port || process.env.PORT || 1332
     @.server       = "http://localhost:#{@.port}"
     @.url_Api_Docs = @.server.append('/v1.0/api-docs')
 
@@ -35,7 +35,7 @@ class Swagger_Service
 
     @app.get /^\/docs(\/.*)?$/, (req, res, next)->
       if (req.url == '/docs') # express static barfs on root url w/o trailing slash
-        res.writeHead(302, { 'Location' : req.url + '/?url=http://localhost:1332/v1.0/api-docs' });
+        res.writeHead(302, { 'Location' : req.url + "/?url=http://localhost:#{@.port}/v1.0/api-docs" });
         res.end();
         return;
       req.url = req.url.substr('/docs'.length); # take off leading /docs so that connect locates file correctly

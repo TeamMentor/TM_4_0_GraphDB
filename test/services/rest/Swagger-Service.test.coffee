@@ -11,8 +11,9 @@ describe '| services | rest | Swagger-Service.test', ->
   swaggerApi     = null
 
   before (done)->
-    server  = new TM_Server({ port : 12346}).configure()
-    options = { app: server.app ,  port : 12346}
+    port     = 10000 + 10000.random()
+    server  = new TM_Server({ port : port}).configure()
+    options = { app: server.app ,  port : port}
     swaggerService = new Swagger_Service options
     swaggerService.set_Defaults()
     ping =

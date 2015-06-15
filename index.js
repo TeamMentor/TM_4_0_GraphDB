@@ -14,11 +14,9 @@ log('[SiteData] loading data from ' + site_Data.siteData_Folder())
 global.config = site_Data.load_Custom_Code()
   .load_Options()
 
-log('------------global.config---------------')
-log(global.config);
-log('----------------------------------------')
-
-
+// log('------------global.config---------------')
+// log(global.config);
+// log('----------------------------------------')
 
 
 var Server = require('./src/TM-Server');           // gets the express server

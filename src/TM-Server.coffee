@@ -8,7 +8,7 @@ class TM_Server
         @.options         = options || {}
         @_server          = null;
         @.app             = express()
-        @.port            = process.env.PORT || @.options.port || 1332
+        @.port            = @.options.port || global.config?.tm_graph?.port || process.env.PORT || 1332
         @.logging_Service = null
 
     configure: =>

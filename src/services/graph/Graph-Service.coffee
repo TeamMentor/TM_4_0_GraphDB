@@ -94,7 +94,6 @@ class Graph_Service
     path_Lib_Uno_Json = @.lib_UNO_Json
     path_Graph_data   = @.lib_UNO_Json.path_Combine('Graph_Data')
 
-    log "[ensure_TM_Uno_Is_Loaded] Using path_To_Lib_Uno_Json: #{path_Lib_Uno_Json}"
     if path_Lib_Uno_Json.folder_Not_Exists()
       log "[ensure_TM_Uno_Is_Loaded] ERROR: Lib_Uno-json folder not found : #{path_Lib_Uno_Json}"
       return callback()
@@ -102,6 +101,7 @@ class Graph_Service
     if path_Lib_Uno_Flag.file_Exists()
       return callback()
 
+    "[ensure_TM_Uno_Is_Loaded] Using path_To_Lib_Uno_Json: #{path_Lib_Uno_Json}".log()
     "[ensure_TM_Uno_Is_Loaded] #{path_Lib_Uno_Flag.file_Name()} file doesn't exist, so deleting GraphDB and re-importing Lib_Uno-Json data".log()
 
     @.deleteDb =>

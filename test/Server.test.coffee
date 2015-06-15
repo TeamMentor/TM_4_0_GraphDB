@@ -8,10 +8,11 @@ describe '| test-Server |',->
   @timeout 5000
   
   server  = null
-
+  port    = null
 
   before ->
-    server = new TM_Server({ port : 12345} ).configure()
+    port = 10000 + 10000.random()
+    server = new TM_Server({ port : port} ).configure()
 
   it 'check ctor', ->
       expect(TM_Server     ).to.be.an('function')
@@ -47,7 +48,7 @@ describe '| test-Server |',->
                     done()
 
   it 'url',->
-      expect(server.url()).to.equal("http://localhost:12345")
+      expect(server.url()).to.equal("http://localhost:#{port}")
 
 
   it 'routes', ->

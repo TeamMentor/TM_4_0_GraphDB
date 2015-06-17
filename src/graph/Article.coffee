@@ -19,9 +19,9 @@ class Article
     @.article_Id_To_Guid article_id, (guid)=>
       #console.log "getting html for:" + article_id
       if(guid)
-        json_File = @.folder_Articles_Html().path_Combine guid + ".json"
-        if json_File.file_Exists()
-          return callback json_File.load_Json()?.html
+        html_File = @.folder_Articles_Html().path_Combine "#{guid.substring(0,2)}/#{guid}.html"
+        if html_File.file_Exists()
+          return callback html_File.file_Contents()
 
       callback null
 

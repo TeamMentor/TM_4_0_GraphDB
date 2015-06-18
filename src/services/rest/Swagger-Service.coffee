@@ -33,24 +33,24 @@ class Swagger_Service
   map_Docs: ()=>
     docs_handler = express.static(@path_Swagger_UI());
 
-    @app.get /^\/docs(\/.*)?$/, (req, res, next)->
-      if (req.url == '/docs') # express static barfs on root url w/o trailing slash
+    @.app.get /^\/docs(\/.*)?$/, (req, res, next)=>
+      if (req.url == '/docs')                                                                             # express static barfs on root url w/o trailing slash
         res.writeHead(302, { 'Location' : req.url + "/?url=http://localhost:#{@.port}/v1.0/api-docs" });
         res.end();
         return;
-      req.url = req.url.substr('/docs'.length); # take off leading /docs so that connect locates file correctly
+      req.url = req.url.substr('/docs'.length);                                                           # take off leading /docs so that connect locates file correctly
       return docs_handler(req, res, next);
     @
 
   setup: =>
-    @map_Docs()
+    @.map_Docs()
     @.app.use(bodyParser.urlencoded({ extended: false }))
     @.app.use(bodyParser.json())
     @.swagger = swagger_node_express.createNew(@app)
     @
 
   addGet: (getSpec)=>
-    @swagger.addGet(getSpec)
+    @.swagger.addGet(getSpec)
     @
 
   #addPost: (getSpec)=>

@@ -31,7 +31,7 @@ class TM_Server
         callback() if callback
 
     url: =>
-        "http://localhost:#{@port}"
+        "http://localhost:#{@.port}"
 
     routes: =>
         routes = @app._router.stack

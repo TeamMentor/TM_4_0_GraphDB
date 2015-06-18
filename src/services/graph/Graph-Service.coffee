@@ -115,9 +115,11 @@ class Graph_Service
       import_Data = (file, callback)=>
         "[ensure_TM_Uno_Is_Loaded] Loading graph data from: #{file.file_Name()}".log()
         graph_Data = file.load_Json()
-        "[ensure_TM_Uno_Is_Loaded] There are #{graph_Data.size()} triplets to import".log()
-
-        async.each graph_Data, @.db.put, callback
+        if graph_Data and graph_Data.size
+          "[ensure_TM_Uno_Is_Loaded] There are #{graph_Data.size()} triplets to import".log()
+          async.each graph_Data, @.db.put, callback
+        else
+          callback()
 
 
       async.each path_Graph_data.files(), import_Data , =>

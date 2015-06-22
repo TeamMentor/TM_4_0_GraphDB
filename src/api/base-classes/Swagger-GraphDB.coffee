@@ -17,7 +17,7 @@ class Swagger_GraphDB extends Swagger_Common
   close_Import_Service_and_Send: (importService, res, data, key)=>
     @.save_To_Cache(key,data)
     importService.graph.closeDb =>
-      res.send data?.json_pretty()
+      res.json data
 
   open_Import_Service: (res, key ,callback)=>
 
@@ -29,7 +29,7 @@ class Swagger_GraphDB extends Swagger_Common
         else                                                # if db could not be opened
           @.send_From_Cache res,key, =>                     #   see if value has been placed on cache (since first check)
             res.status(503)                                 #   and if the value is still not of the cache, send a 503 error
-              .send { error : message : 'GraphDB is busy, please try again'}
+               .json { error : message : 'GraphDB is busy, please try again'}
 
   save_To_Cache: (key,data)=>
     if @.cache_Enabled
@@ -47,7 +47,7 @@ class Swagger_GraphDB extends Swagger_Common
   send_From_Cache: (res, key, callback)=>
     if @.cache_Enabled
       if (key and @.cache.has_Key(key))
-        return res.send @.cache.get(key)
+        return res.json @.cache.get(key)?.json_Parse()
 
     callback()
 

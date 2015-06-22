@@ -1,8 +1,7 @@
-Swagger_Common  = require './base-classes/Swagger-Common'
-Config_Service  = require '../services/utils/Config-Service'
-Import_Service  = require '../services/data/Import-Service'
-#TM_Guidance     = require '../graph/TM-Guidance'
-Cache_Service   = require('teammentor').Cache_Service
+Swagger_Common   = require './base-classes/Swagger-Common'
+Config_Service   = require '../services/utils/Config-Service'
+Import_Service   = require '../services/data/Import-Service'
+{Cache_Service}  = require 'teammentor'
 
 
 class Config_API extends Swagger_Common

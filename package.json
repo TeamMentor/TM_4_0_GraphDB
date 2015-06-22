@@ -2,15 +2,16 @@
   "name": "TM_4_0_GraphDB",
   "version": "0.0.1",
   "description": "Code for the Graph DB used by TM 4.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "npm run start-nodemon",
     "test": "node ./node_modules/mocha/bin/mocha --compilers coffee:coffee-script/register --recursive -R list",
     "test-js": "node ./node_modules/mocha/bin/mocha --recursive -R list ./.dist/test",
     "clear-cache": "touch .tmCache/.deleteCacheNext",
     "watch": "mocha -w --compilers coffee:coffee-script/register --watch-extensions jade  --recursive -R list",
     "watch-js": "node ./node_modules/mocha/bin/mocha --recursive -R list -w ./.dist/test",
-    "dev": "node ./node_modules/supervisor/lib/cli-wrapper.js -e 'coffee,js' index.js",
+    "dev": "node ./node_modules/supervisor/lib/cli-wrapper.js -e 'coffee,js' app.js",
+    "start-nodemon": "node ./node_modules/.bin/nodemon --watch src -e coffee app.js",
     "compile": "coffee --output ./.dist/src --compile ./src &&  coffee --output ./.dist/test --compile ./test",
     "coverage": "./bin/local-code-coverage.sh",
     "installWinSvc": "node ./node_modules/winser/bin/winser -i",
@@ -64,6 +65,7 @@
     "html-file-cov": "latest",
     "mocha": "latest",
     "mocha-lcov-reporter": "latest",
+    "nodemon": "^1.3.7",
     "supertest": "latest",
     "supervisor": "latest"
   }

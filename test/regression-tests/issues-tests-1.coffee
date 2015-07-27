@@ -1,4 +1,5 @@
 Import_Service = require('./../../src/services/data/Import-Service')
+Query_Tree = require('./../../src/services/data/Query-Tree')
 
 describe '| regression-tests | tests-1',->
   importService  = null
@@ -16,5 +17,8 @@ describe '| regression-tests | tests-1',->
   #after (done)->
   #  importService.graph.closeDb ->
   #    done()
+
+  it 'Issue 902 - Dev branch of tm-sme/Lib_UNO crashes GraphDB', ->
+    console.log 'aaa'
 
 

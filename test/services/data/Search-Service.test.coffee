@@ -93,5 +93,5 @@ describe '| services | data | Search-Service.test |', ->
     searchService.query_From_Text_Search text, (query_Id)->
       query_Id.assert_Is 'search-security'
       importService.graph_Find.get_Subject_Data query_Id, (data)->
-        data.title.assert_Is text
+        data.title.assert_Is text.lower()
         done();

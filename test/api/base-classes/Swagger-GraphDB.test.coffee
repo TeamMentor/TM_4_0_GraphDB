@@ -43,8 +43,8 @@ describe '| api | base-classes | Swagger-GraphDB.test |', ->
         closeDb: (callback)=>
           callback()
     res =
-      send: (data)=>
-        data.json_Parse().json_Str().assert_Is (temp_Data.json_Str())
+      json: (data)=>
+        data.json_Str().assert_Is (temp_Data.json_Str())
         tmp_Cache.get(temp_Key).json_Parse().json_Str().assert_Is (temp_Data.json_Str())
         done()
 
@@ -108,8 +108,8 @@ describe '| api | base-classes | Swagger-GraphDB.test | open_Import_Service', ->
     temp_Key      = 'key_'.add_5_Letters()
 
     res =
-      send: (data)=>
-        data.json_Parse().json_Str().assert_Is(temp_Data.json_Str())
+      json: (data)=>
+        data.json_Str().assert_Is(temp_Data.json_Str())
         tmp_Cache.get(temp_Key).json_Parse().json_Str().assert_Is (temp_Data.json_Str())
         done()
 
@@ -123,8 +123,8 @@ describe '| api | base-classes | Swagger-GraphDB.test | open_Import_Service', ->
     temp_Key      = 'key_'.add_Random_Letters (1000);
 
     res =
-      send: (data)=>
-        data.json_Parse().json_Str().assert_Is(temp_Data.json_Str())
+      json: (data)=>
+        data.json_Str().assert_Is(temp_Data.json_Str())
         tmp_Cache.has_Key(temp_Key).assert_Is_False()
         done()
 
@@ -138,8 +138,8 @@ describe '| api | base-classes | Swagger-GraphDB.test | open_Import_Service', ->
     temp_Key      = 'key_'.add_Random_Letters (1000);
 
     res =
-      send: (data)=>
-        data?.assert_Is_Undefined()
+      json: (data)=>
+        assert_Is_Undefined(data)
         tmp_Cache.has_Key(temp_Key).assert_Is_False()
         done()
 
@@ -149,13 +149,13 @@ describe '| api | base-classes | Swagger-GraphDB.test | open_Import_Service', ->
 
   it 'sending data in cache', (done)->
 
-    temp_Data     = 'data_'.add_5_Letters()
+    temp_Data     = { abc :'data_'.add_5_Letters() }
     temp_Key      = 'key_'.add_5_Letters()
 
     res =
-      send: (data)=>
-        data                   .assert_Is temp_Data   # there is a small variation with the previous test (which could cause probs when strings are saved)
-        tmp_Cache.get(temp_Key).assert_Is temp_Data
+      json: (data)=>
+        data                                .assert_Is temp_Data
+        tmp_Cache.get(temp_Key).json_Parse().assert_Is temp_Data  # data is stored as a string
         done()
 
     tmp_Cache.put temp_Key, temp_Data
@@ -170,7 +170,7 @@ describe '| api | base-classes | Swagger-GraphDB.test | open_Import_Service', ->
       status: (value)->
         value.assert_Is 503
         @
-      send: (data)->
+      json: (data)->
         data.assert_Is error: { message: 'GraphDB is busy, please try again' }
         import_Service.graph.deleteDb ->
           done()
@@ -191,8 +191,8 @@ describe '| api | base-classes | Swagger-GraphDB.test | open_Import_Service', ->
     temp_Key      = 'key_'.add_5_Letters()
 
     res =
-      send: (data)->
-        data                   .assert_Is temp_Data
+      json: (data)->
+        data                   .assert_Is {}
         tmp_Cache.get(temp_Key).assert_Is temp_Data
         import_Service.graph.deleteDb ->
           done()

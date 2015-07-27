@@ -11,11 +11,15 @@ describe '| graph | Article', ->
 
   before (done)->
     article      = new Article()
-    article_Id   = "article-" + article.folder_Articles_Html().files().first().split('-').last().remove(".json")
+    articles_Html = article.folder_Articles_Html().files_Recursive()
+    article_File  = articles_Html.first()
+    article_Id    = "article-" + article_File.split('-').last().remove(".html")
+    articles_Html.assert_Not_Empty()
+    article_File.assert_Is_String()
+    article_Id.assert_Is_String()
+
     importService = article.importService
     importService.graph.openDb ->
-      #article.ids (articles_Ids)=>
-      #  article_Id = articles_Ids.first()
       done()
 
   after (done)->
@@ -27,7 +31,7 @@ describe '| graph | Article', ->
 
   it 'folder_Articles_Html', ()->
     article.folder_Articles_Html().assert_Folder_Exists()
-    article.folder_Articles_Html().files().size().assert_Bigger_Than 2000
+    article.folder_Articles_Html().files_Recursive().size().assert_Bigger_Than 2000
 
   it 'article_Id_To_Guid', (done)->
 

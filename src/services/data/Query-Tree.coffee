@@ -104,6 +104,8 @@ class Query_Tree
       @.apply_Query_Tree_Articles_Filter query_Tree, articles, callback
 
   apply_Query_Tree_Articles_Filter: (query_Tree, articles, callback)=>
+      if not query_Tree
+        return callback {}
 
       filtered_Tree =
         id         : query_Tree.id

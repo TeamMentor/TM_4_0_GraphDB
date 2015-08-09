@@ -18,7 +18,3 @@ describe '| regression-tests | tests-1',->
   #  importService.graph.closeDb ->
   #    done()
 
-  it 'Issue 902 - Dev branch of tm-sme/Lib_UNO crashes GraphDB', ->
-    console.log 'aaa'
-
-

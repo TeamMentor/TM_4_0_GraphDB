@@ -34,7 +34,7 @@ describe '| api | User-API.test', ->
 
   it 'setup', ->
     using userApi.target_Folder, ->
-      @.assert_Contains ['TM_GraphDB' , '.tmCache' , '.user_Searches']
+      @.assert_Contains ['.tmCache' , '.user_Searches']
       @.assert_Folder_Exists()
 
   it 'log_search_valid', (done)->

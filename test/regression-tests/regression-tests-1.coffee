@@ -1,3 +1,11 @@
+# this is temp until the global.config is replaced with a config class (like in TM_Design)
+require 'fluentnode'
+root_Folder = process.cwd().path_Combine '../../'
+tm_Cache      = root_Folder.path_Combine '.tmCache'
+global.config =
+  tm_graph:
+    folder_Lib_UNO_Json     : root_Folder.path_Combine 'data/Lib_UNO-Json'
+
 
 supertest = require 'supertest'
 express   = require 'express'

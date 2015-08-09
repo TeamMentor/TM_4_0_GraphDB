@@ -25,15 +25,17 @@ class Logging_Service
     @
 
   hook_Console: =>
-    console.log 'Hooking Console to Winston logger'
-    @.original_Console = console.log
-    console.log        = (args...)=> @.info args...
-    global.logger      = @
-    log '[Logging-Service] console hooked'
+    if(console.log?.source_Code() is "function () { [native code] }")
+      console.log 'Hooking Console to Winston logger'
+      @.original_Console = console.log
+      console.log        = (args...)=> @.info args...
+      global.logger      = @
+      log '[Logging-Service] console hooked'
 
   restore_Console: =>
-    console.log = @.original_Console
-    log 'Console restored'
+    if @.original_Console
+      console.log = @.original_Console
+      log 'Console restored'
 
   info: (data)=>
     @.logger.info data

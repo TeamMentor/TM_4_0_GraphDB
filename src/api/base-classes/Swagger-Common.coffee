@@ -17,7 +17,6 @@ class Swagger_Common
     get_Command =
           spec       : { path : "/#{@.area}/#{name}", nickname : name, parameters : []}
           action     : (req,res)=> @[name](req, res)
-
     for param in params
       get_Command.spec.path += "/{#{param}}"
       get_Command.spec.parameters.push(paramTypes.path(param, 'method parameter', 'string'))

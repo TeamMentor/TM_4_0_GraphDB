@@ -42,10 +42,9 @@ describe '| test-Server |',->
 
             server.stop ->
                 request server.url(), (error, response,data)->
-                    expect(error        ).to.not.equal(null)
-                    expect(error.message).to.equal('connect ECONNREFUSED')
-                    expect(response     ).to.equal(undefined)
-                    done()
+                  error.message.assert_Contains 'connect ECONNREFUSED'
+                  assert_Is_Undefined response
+                  done()
 
   it 'url',->
       expect(server.url()).to.equal("http://localhost:#{port}")

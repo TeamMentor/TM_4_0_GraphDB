@@ -25,7 +25,7 @@ class TM_Server
 
     stop: (callback)=>
       @.logging_Service.restore_Console()
-      @_server._connections = 0   # trick the server to believe there are no more connections (I didn't find a nice way to get and open existing connections)
+      @_server._connections = 0   # trick the server to believe there are no more connections: I didn't find a nice way to get and open existing connections
 
       @_server.close ->
         callback() if callback

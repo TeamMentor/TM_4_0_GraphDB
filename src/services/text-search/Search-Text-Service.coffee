@@ -16,19 +16,22 @@ class Search_Text_Service
     @.options             = options || {}
     @.importService       = @.options.importService
     @.cache_Search        = new Cache_Service("search_cache")
+
     @.folder_Lib_UNO_Json = global.config?.tm_graph?.folder_Lib_UNO_Json
 
   folder_Search_Data: ()=>
-    @.folder_Lib_UNO_Json.path_Combine 'Search_Data'
+    @.folder_Lib_UNO_Json?.path_Combine 'Search_Data'
 
 
   search_Mappings: (callback)=>
+    console.log @folder_Search_Data()
+
     if loaded_Search_Mappings
       return callback loaded_Search_Mappings
 
-    key = @.folder_Search_Data().path_Combine 'search_mappings.json'
+    key = @.folder_Search_Data()?.path_Combine 'search_mappings.json'
 
-    if key.file_Exists()
+    if key?.file_Exists()
       loaded_Search_Mappings = key.load_Json()
       return callback loaded_Search_Mappings
     callback {}

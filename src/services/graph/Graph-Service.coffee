@@ -92,9 +92,9 @@ class Graph_Service
       return callback()
     path_Lib_Uno_Flag = @.lib_Loaded_Flag
     path_Lib_Uno_Json = @.lib_UNO_Json
-    path_Graph_data   = @.lib_UNO_Json.path_Combine('Graph_Data')
+    path_Graph_data   = @.lib_UNO_Json?.path_Combine('Graph_Data')
 
-    if path_Lib_Uno_Json.folder_Not_Exists()
+    if (not path_Lib_Uno_Json) or path_Lib_Uno_Json.folder_Not_Exists()
       log "[ensure_TM_Uno_Is_Loaded] ERROR: Lib_Uno-json folder not found : #{path_Lib_Uno_Json}"
       return callback()
 

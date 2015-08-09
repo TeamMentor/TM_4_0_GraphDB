@@ -102,13 +102,6 @@ class Data_API extends Swagger_GraphDB
       import_Service.query_Mappings.get_Query_Mappings id, (data)=>
         @close_Import_Service_and_Send import_Service, res, data, cache_Key
 
-  query_tree: (req,res)=>
-    id        = req.params.id
-    cache_Key = "query_tree_#{id}.json"
-    @open_Import_Service res, cache_Key, (import_Service)=>
-      import_Service.query_Tree.get_Query_Tree id, (data)=>
-        @close_Import_Service_and_Send import_Service, res, data, cache_Key
-
   query_tree_filtered: (req,res)=>
     id       = req.params.id
     filters  = req.params.filters
@@ -136,6 +129,50 @@ class Data_API extends Swagger_GraphDB
       @.find_Tags (tags)=>
         send tags.keys()
 
+  query_tree: (req,res)=>
+    id        = req.params.id
+    cache_Key = "query_tree_#{id}.json"
+    @open_Import_Service res, cache_Key, (import_Service)=>
+      import_Service.query_Tree.get_Query_Tree id, (data)=>
+        @close_Import_Service_and_Send import_Service, res, data, cache_Key
+
+
+  query_tree_articles: (req,res)=>
+    id        = req.params.id
+    from      = req.params.from
+    size      = req.params.size
+    cache_Key = "query_tree_filters#{id}-#{from}-#{size}.json"
+    @open_Import_Service res, cache_Key, (import_Service)=>
+      import_Service.query_Tree.get_Query_Tree id, (data)=>
+        filtered_Data =
+          id        : data?.id
+          title     : data?.title
+          results   : data?.results.slice(from,size)
+        @close_Import_Service_and_Send import_Service, res, filtered_Data, cache_Key
+
+  query_tree_filters: (req,res)=>
+    id        = req.params.id
+    cache_Key = "query_tree_filters#{id}.json"
+    @open_Import_Service res, cache_Key, (import_Service)=>
+      import_Service.query_Tree.get_Query_Tree id, (data)=>
+        filtered_Data =
+          id        : data?.id
+          title     : data?.title
+          filters   : data?.filters
+        @close_Import_Service_and_Send import_Service, res, filtered_Data, cache_Key
+
+  query_tree_queries: (req,res)=>
+    id        = req.params.id
+    cache_Key = "query_tree_query#{id}.json"
+    @open_Import_Service res, cache_Key, (import_Service)=>
+      import_Service.query_Tree.get_Query_Tree id, (data)=>
+        filtered_Data =
+          id        : data?.id
+          title     : data?.title
+          containers: data?.containers
+        @close_Import_Service_and_Send import_Service, res, filtered_Data, cache_Key
+
+
   add_Methods: ()=>
     @add_Get_Method 'article'                 , ['ref']
     @add_Get_Method 'articles'                , [     ]
@@ -150,11 +187,16 @@ class Data_API extends Swagger_GraphDB
     @add_Get_Method 'query_parent_queries'    , ['id' ]
     @add_Get_Method 'queries'                 , [     ]
     @add_Get_Method 'queries_mappings'        , [     ]
-    @add_Get_Method 'query_tree'              , ['id' ]
     @add_Get_Method 'query_tree_filtered'     , ['id','filters' ]
     @add_Get_Method 'root_queries'            , [     ]
     @add_Get_Method 'tags'                    , [     ]
     @add_Get_Method 'tag_Values'              , [     ]
+
+    @add_Get_Method 'query_tree'              , ['id' ]
+    @add_Get_Method 'query_tree_articles'     , ['id','from','size' ]
+    @add_Get_Method 'query_tree_filters'      , ['id' ]
+    @add_Get_Method 'query_tree_queries'      , ['id' ]
+
     @
 
 

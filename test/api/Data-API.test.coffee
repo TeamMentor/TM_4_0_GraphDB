@@ -9,7 +9,7 @@ describe '| api | Data-API.test', ->
     clientApi      = null
     dataApi      = null
 
-    before (done)->
+    beforeEach (done)->
       port     = 10000 + 10000.random()
       tmServer = new TM_Server({ port : port}).configure()
       options  = { app: tmServer.app ,  port : tmServer.port}
@@ -24,7 +24,7 @@ describe '| api | Data-API.test', ->
           clientApi = swaggerApi
           done()
 
-    after (done)->
+    afterEach (done)->
       tmServer.stop ->
         done()
 
@@ -159,6 +159,13 @@ describe '| api | Data-API.test', ->
         #data.obj.keys().assert_Size_Is_Bigger_Than 10
         done()
 
+    it 'tags', (done)->
+      clientApi.tags  (tags_Data)=>
+        tags_Data.keys().assert_Not_Empty()
+        tags_Data.values().assert_Not_Empty()
+        done()
+
+
     it 'query_tree', (done)->
       clientApi.root_queries (data)=>
         root_Queries = data.obj
@@ -167,6 +174,59 @@ describe '| api | Data-API.test', ->
           query_Tree = data.obj
           query_Tree.id.assert_Is(query_Id )
           done()
+
+    it 'query_tree_articles', (done)->
+      @timeout 4000
+      clientApi.root_queries (data)=>
+        root_Queries = data.obj
+        query_Id = root_Queries.queries.first().id
+        from     = 0
+        size     = 30
+        clientApi.query_tree_articles { id: query_Id, from: from, size: size }, (data)=>
+          using data.obj,->
+            @.id.assert_Is query_Id
+            @.title.assert_Is 'Type'
+            @.results.assert_Size_Is size
+
+            assert_Is_Undefined @.containers
+            assert_Is_Undefined @.filters
+
+            from = 2
+            size = 10
+            clientApi.query_tree_articles { id: query_Id, from: from, size: size }, (data_2)=>
+              data_2.obj.results.assert_Is data.obj.results.slice(from,size)
+              data_2.obj.results.assert_Size_Is size - from
+              done()
+
+    it 'query_tree_filters', (done)->
+      @timeout 4000
+      clientApi.root_queries (data)=>
+        root_Queries = data.obj
+        query_Id = root_Queries.queries.first().id
+        clientApi.query_tree_filters { id: query_Id }, (data)=>
+          using data.obj,->
+            @.id.assert_Is query_Id
+            @.title.assert_Is 'Type'
+            @.filters.assert_Not_Empty()
+            assert_Is_Undefined @.containers
+            assert_Is_Undefined @.results
+            done()
+
+    it 'query_tree_queries', (done)->
+      clientApi.root_queries (data)=>
+        root_Queries = data.obj
+        query_Id = root_Queries.queries.first().id
+        clientApi.query_tree_queries { id:query_Id }, (data)=>
+          using data.obj,->
+            @.id.assert_Is query_Id
+            @.title.assert_Is 'Type'
+            @.containers.assert_Not_Empty()
+            assert_Is_Undefined @.results
+            assert_Is_Undefined @.filters
+            done()
+
+
+
 
     it 'query_tree_filtered (one filter)', (done)->
       @timeout 10000
@@ -201,15 +261,6 @@ describe '| api | Data-API.test', ->
           filter_Query_Id = "query-10db76a18a35,query-1320f210feae" #WCF,Implementation
           filters         = filter_Query_Id
           clientApi.query_tree_filtered {id: query_Id, filters: filters }, (data)=>
-            #log result_Filter_1.size
+  #log result_Filter_1.size
             done()
-
-    it 'tags', (done)->
-      clientApi.tags  (tags_Data)=>
-        tags_Data.keys().assert_Not_Empty()
-        tags_Data.values().assert_Not_Empty()
-        done()
-
-
-
 

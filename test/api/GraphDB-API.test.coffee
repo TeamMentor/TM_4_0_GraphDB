@@ -11,7 +11,7 @@ describe '| api | GraphDB-API.test', ->
 
   @.timeout 5000
   
-  before (done)->
+  beforeEach (done)->
     graphDbApi = new GraphDB_API()
     port       = 10000 + 10000.random()
     tmServer   = new TM_Server({ port : port}).configure()
@@ -28,7 +28,7 @@ describe '| api | GraphDB-API.test', ->
       clientApi = swaggerApi
       done()
 
-  after (done)->
+  afterEach (done)->
     tmServer.stop ->
       done()
 
@@ -99,3 +99,8 @@ describe '| api | GraphDB-API.test', ->
       clientApi.sub_pre { subject: article_Id, predicate: 'is' }, (data)->
         data.obj.first().object.assert_Is 'Article'
         done()
+
+  it 'status', (done)->
+    clientApi.status (data)->
+      console.log data.obj.assert_Is status: 'ok'
+      done()

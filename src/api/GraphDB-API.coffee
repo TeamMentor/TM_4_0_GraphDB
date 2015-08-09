@@ -52,6 +52,11 @@ class GraphDB_API extends Swagger_GraphDB
       @.using_Graph res, null, (send)->
         @.search subject, predicate, undefined, send
 
+    status: (req, res)=>
+      value = req.params?.value || ''
+      @.using_Graph res, null, (send)->
+        send { status: 'ok' }
+
     add_Methods: ()=>
 
       @.add_Get_Method 'contents'   , []
@@ -63,6 +68,7 @@ class GraphDB_API extends Swagger_GraphDB
       @.add_Get_Method 'object'     , ['value']
       @.add_Get_Method 'sub_pre'    , ['subject', 'predicate']
       @.add_Get_Method 'pre_obj'    , ['predicate','object']
+      @.add_Get_Method 'status'     , []
 
 
 

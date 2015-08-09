@@ -140,19 +140,19 @@ class Data_API extends Swagger_GraphDB
   query_tree_articles: (req,res)=>
     id        = req.params.id
     from      = req.params.from
-    size      = req.params.size
-    cache_Key = "query_tree_filters#{id}-#{from}-#{size}.json"
+    to      = req.params.to
+    cache_Key = "query_tree_articles_#{id}-#{from}-#{to}.json"
     @open_Import_Service res, cache_Key, (import_Service)=>
       import_Service.query_Tree.get_Query_Tree id, (data)=>
         filtered_Data =
           id        : data?.id
           title     : data?.title
-          results   : data?.results.slice(from,size)
+          results   : data?.results.slice(from,to)
         @close_Import_Service_and_Send import_Service, res, filtered_Data, cache_Key
 
   query_tree_filters: (req,res)=>
     id        = req.params.id
-    cache_Key = "query_tree_filters#{id}.json"
+    cache_Key = "query_tree_filters_#{id}.json"
     @open_Import_Service res, cache_Key, (import_Service)=>
       import_Service.query_Tree.get_Query_Tree id, (data)=>
         filtered_Data =
@@ -163,7 +163,7 @@ class Data_API extends Swagger_GraphDB
 
   query_tree_queries: (req,res)=>
     id        = req.params.id
-    cache_Key = "query_tree_query#{id}.json"
+    cache_Key = "query_tree_queries_#{id}.json"
     @open_Import_Service res, cache_Key, (import_Service)=>
       import_Service.query_Tree.get_Query_Tree id, (data)=>
         filtered_Data =
@@ -193,7 +193,7 @@ class Data_API extends Swagger_GraphDB
     @add_Get_Method 'tag_Values'              , [     ]
 
     @add_Get_Method 'query_tree'              , ['id' ]
-    @add_Get_Method 'query_tree_articles'     , ['id','from','size' ]
+    @add_Get_Method 'query_tree_articles'     , ['id','from','to' ]
     @add_Get_Method 'query_tree_filters'      , ['id' ]
     @add_Get_Method 'query_tree_queries'      , ['id' ]
 

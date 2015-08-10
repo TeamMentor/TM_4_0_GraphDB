@@ -181,21 +181,22 @@ describe '| api | Data-API.test', ->
         root_Queries = data.obj
         query_Id = root_Queries.queries.first().id
         from     = 0
-        size     = 30
-        clientApi.query_tree_articles { id: query_Id, from: from, size: size }, (data)=>
+        to     = 30
+        clientApi.query_tree_articles { id: query_Id, from: from, to: to }, (data)=>
           using data.obj,->
             @.id.assert_Is query_Id
             @.title.assert_Is 'Type'
-            @.results.assert_Size_Is size
+            @.results.assert_Size_Is to - from
+            @.size.assert_Is_Bigger_Than 1000
 
             assert_Is_Undefined @.containers
             assert_Is_Undefined @.filters
 
             from = 2
-            size = 10
-            clientApi.query_tree_articles { id: query_Id, from: from, size: size }, (data_2)=>
-              data_2.obj.results.assert_Is data.obj.results.slice(from,size)
-              data_2.obj.results.assert_Size_Is size - from
+            to = 10
+            clientApi.query_tree_articles { id: query_Id, from: from, to: to }, (data_2)=>
+              data_2.obj.results.assert_Is data.obj.results.slice(from,to)
+              data_2.obj.results.assert_Size_Is to - from
               done()
 
     it 'query_tree_filters', (done)->

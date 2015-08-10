@@ -148,6 +148,7 @@ class Data_API extends Swagger_GraphDB
           id        : data?.id
           title     : data?.title
           results   : data?.results.slice(from,to)
+          size      : data?.results.size()
         @close_Import_Service_and_Send import_Service, res, filtered_Data, cache_Key
 
   query_tree_filters: (req,res)=>

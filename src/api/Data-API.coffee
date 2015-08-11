@@ -138,18 +138,20 @@ class Data_API extends Swagger_GraphDB
 
 
   query_tree_articles: (req,res)=>
-    id        = req.params.id
-    from      = req.params.from
-    to      = req.params.to
-    cache_Key = "query_tree_articles_#{id}-#{from}-#{to}.json"
-    @open_Import_Service res, cache_Key, (import_Service)=>
-      import_Service.query_Tree.get_Query_Tree id, (data)=>
-        filtered_Data =
-          id        : data?.id
-          title     : data?.title
-          results   : data?.results.slice(from,to)
-          size      : data?.results.size()
-        @close_Import_Service_and_Send import_Service, res, filtered_Data, cache_Key
+    id       = req.params.id
+    from     = req.params.from
+    to       = req.params.to
+    host     = req.headers.host
+    url      = "/data/query_tree/#{id}"               # a) find if there is a better way to do this query
+    full_Url = "http://#{host}#{url}"                 # b) improve this caching code so that we don't need to do this
+
+    full_Url.GET_Json (data)=>                        # this is needed in order to use the previously created (and cached) query_tree object
+      filtered_Data =
+            id        : data?.id
+            title     : data?.title
+            results   : data?.results.slice(from,to)
+            size      : data?.results.size()
+      res.json filtered_Data
 
   query_tree_filters: (req,res)=>
     id        = req.params.id

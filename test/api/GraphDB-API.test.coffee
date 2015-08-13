@@ -104,3 +104,11 @@ describe '| api | GraphDB-API.test', ->
     clientApi.status (data)->
       console.log data.obj.assert_Is status: 'ok'
       done()
+
+  it 'cache_path', (done)->
+    clientApi.cache_path (data)->
+      using data.obj.path, ->
+        @.assert_Folder_Exists()
+        @.files().file_Names().first().assert_Is 'tm-uno-loaded.flag'
+        @.folders().file_Names().assert_Contains(['data_cache','tm-uno'])
+        done()

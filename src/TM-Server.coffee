@@ -5,11 +5,12 @@ Logging_Service      = require './services/utils/Logging-Service'
 
 class TM_Server
     constructor: (options)->
-        @.options         = options || {}
-        @_server          = null;
-        @.app             = express()
-        @.port            = @.options.port || global.config?.tm_graph?.port || process.env.PORT || 1332
-        @.logging_Service = null
+        @.options          = options || {}
+        @_server           = null;
+        @.app              = express()
+        @.port             = @.options.port || global.config?.tm_graph?.port || process.env.PORT || 1332
+        @.logging_Service  = null
+        @.log_All_Requests = true
 
     configure: =>
         @.app.set('view engine', 'jade')
@@ -44,8 +45,9 @@ class TM_Server
     enable_Logging: =>
       @.logging_Service = new Logging_Service().setup()
 
-      @.app.use (req, res, next)->
-        console.log({method: req.method, url: req.url})
+      @.app.use (req, res, next)=>
+        if @.log_All_Requests
+          console.log({method: req.method, url: req.url})
         next();
         
 module.exports = TM_Server

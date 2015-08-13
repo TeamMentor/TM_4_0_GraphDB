@@ -57,7 +57,7 @@ class Graph_Service
     tries = @.db_Lock_Tries
     delay = @.db_Lock_Delay
     check_Lock = =>
-      console.log "checking lock: #{tries} : #{locked}"
+      console.log "checking lock: #{tries}"
       if locked is true
         if tries
           tries--
@@ -65,6 +65,7 @@ class Graph_Service
             process.nextTick =>
               check_Lock()
         else
+          console.log "[wait_For_Unlocked_DB] failed to get a lock after : #{@.db_Lock_Tries}"
           callback_Fail()
       else
         callback_Ok()

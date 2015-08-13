@@ -214,11 +214,13 @@ describe '| api | Data-API.test', ->
             done()
 
     it 'query_tree_queries', (done)->
+      @timeout 4000
       clientApi.root_queries (data)=>
         root_Queries = data.obj
         query_Id = root_Queries.queries.first().id
         clientApi.query_tree_queries { id:query_Id }, (data)=>
           using data.obj,->
+            @.assert_Is_Not {}
             @.id.assert_Is query_Id
             @.title.assert_Is 'Type'
             @.containers.assert_Not_Empty()
@@ -228,13 +230,12 @@ describe '| api | Data-API.test', ->
 
 
 
-
     it 'query_tree_filtered (one filter)', (done)->
       @timeout 10000
       clientApi.root_queries (data)=>
         root_Queries = data.obj
         #query_Id = root_Queries.queries.second().id
-        query_Id = 'query-9580060e39dc'# Create Temporary Files Carefully
+        query_Id = 'query-9580060e39dc'   # Create Temporary Files Carefully
         filters  = ''
         clientApi.query_tree {id: query_Id, filters: filters }, (data)=>
           size_No_Filters = data.obj.results.size()
@@ -262,6 +263,54 @@ describe '| api | Data-API.test', ->
           filter_Query_Id = "query-10db76a18a35,query-1320f210feae" #WCF,Implementation
           filters         = filter_Query_Id
           clientApi.query_tree_filtered {id: query_Id, filters: filters }, (data)=>
-  #log result_Filter_1.size
             done()
 
+
+    it 'query_tree_filtered_articles', (done)->
+      clientApi.root_queries (data)=>
+        query_Id = 'query-6234f2d47eb7'
+        filters  = 'query-184728a6e3ba'
+        from     = 0
+        to       = 10
+        clientApi.query_tree_filtered_articles {id: query_Id, filters: filters, from: from , to :to }, (data)=>
+          using data.obj,->
+            @.id.assert_Is query_Id
+            @.title.assert_Is 'Index'
+            @.results.assert_Size_Is to - from
+            @.size.assert_Is_Bigger_Than 50
+
+            assert_Is_Undefined @.containers
+            assert_Is_Undefined @.filters
+
+            from = 2
+            to = 10
+            clientApi.query_tree_filtered_articles {id: query_Id, filters: filters, from: from , to :to }, (data_2)=>
+              data_2.obj.results.assert_Is data.obj.results.slice(from,to)
+              data_2.obj.results.assert_Size_Is to - from
+              done()
+
+    it 'query_tree_filtered_filters', (done)->
+      query_Id = 'query-6234f2d47eb7'
+      filters  = 'query-184728a6e3ba'
+      clientApi.query_tree_filtered_filters { id: query_Id, filters:filters }, (data)=>
+        using data.obj,->
+          @.id.assert_Is query_Id
+          @.title.assert_Is 'Index'
+          @.filters.assert_Not_Empty()
+          assert_Is_Undefined @.containers
+          assert_Is_Undefined @.results
+          done()
+
+
+    it 'query_tree_filtered_queries', (done)->
+      query_Id = 'query-6234f2d47eb7'
+      filters  = 'query-184728a6e3ba'
+      clientApi.query_tree_filtered_queries { id: query_Id, filters:filters }, (data)=>
+        using data.obj,->
+          @.assert_Is_Not {}
+          @.id.assert_Is query_Id
+          @.title.assert_Is 'Index'
+          @.containers.assert_Not_Empty()
+          assert_Is_Undefined @.results
+          assert_Is_Undefined @.filters
+          done()

@@ -87,15 +87,15 @@ class Query_Tree
     @.import_Service.query_Mappings.get_Queries_Mappings (queries_Mappings)=>
 
       articles = []
+      if query_Ids
+        for query_Id in query_Ids.split(',')
 
-      for query_Id in query_Ids.split(',')
-
-        filter_Query     = queries_Mappings[query_Id]
-        if filter_Query
-          if articles.empty()
-            articles = filter_Query.articles
-          else
-            articles = (article for article in articles when article in filter_Query.articles)
+          filter_Query     = queries_Mappings[query_Id]
+          if filter_Query
+            if articles.empty()
+              articles = filter_Query.articles
+            else
+              articles = (article for article in articles when article in filter_Query.articles)
 
 
       if articles.empty()

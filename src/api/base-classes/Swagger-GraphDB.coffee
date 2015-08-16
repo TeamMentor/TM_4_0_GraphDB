@@ -38,9 +38,9 @@ class Swagger_GraphDB extends Swagger_Common
             else                                                # if db could not be opened
               @.send_From_Cache res,key, =>                     #   see if value has been placed on cache (since first check)
                 res.status(503)                                 #   and if the value is still not of the cache, send a 503 error
-
                    .json { error : message : 'GraphDB is busy, please try again'}
       import_Service.graph.wait_For_Unlocked_DB after_Wait_For_Unlocked_DB, after_Wait_For_Unlocked_DB
+
   save_To_Cache: (key,data)=>
     if @.cache_Enabled
       if key and data                                     # check that both values are set

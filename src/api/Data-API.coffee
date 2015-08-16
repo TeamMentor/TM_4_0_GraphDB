@@ -1,6 +1,7 @@
 GraphDB_API          = require '../../src/api/GraphDB-API'
 Swagger_GraphDB      = require './base-classes/Swagger-GraphDB'
 Article              = require '../graph/Article'
+Query_View_Model     = require '../../src/services/data/Query-View-Model'
 
 class Data_API extends Swagger_GraphDB
   constructor: (options)->
@@ -227,6 +228,22 @@ class Data_API extends Swagger_GraphDB
         size      : data?.results?.size()
       res.json filtered_Data
 
+  query_view_model: (req,res)=>
+    id       = req.params.id
+    filters  = ''
+    from     = req.params.from
+    to       = req.params.to
+    new Query_View_Model().get_View_Model id, filters, from, to, (data)->
+      res.json data
+
+  query_view_model_filtered: (req,res)=>
+    id       = req.params.id
+    filters  = req.params.filters
+    from     = req.params.from
+    to       = req.params.to
+    new Query_View_Model().get_View_Model id, filters, from, to, (data)->
+      res.json data
+
 
   add_Methods: ()=>
     @add_Get_Method 'article'                 , ['ref']
@@ -246,6 +263,7 @@ class Data_API extends Swagger_GraphDB
     @add_Get_Method 'tags'                    , [     ]
     @add_Get_Method 'tag_Values'              , [     ]
 
+
     @add_Get_Method 'query_tree'              , ['id' ]
     @add_Get_Method 'query_tree_articles'     , ['id','from','to' ]
     @add_Get_Method 'query_tree_filters'      , ['id' ]
@@ -255,6 +273,10 @@ class Data_API extends Swagger_GraphDB
     @add_Get_Method 'query_tree_filtered_articles', ['id','filters','from','to' ]
     @add_Get_Method 'query_tree_filtered_filters' , ['id','filters' ]
     @add_Get_Method 'query_tree_filtered_queries' , ['id','filters' ]
+
+
+    @add_Get_Method 'query_view_model'            , ['id','from','to' ]
+    @add_Get_Method 'query_view_model_filtered'   , ['id','filters','from','to' ]
 
     @
 

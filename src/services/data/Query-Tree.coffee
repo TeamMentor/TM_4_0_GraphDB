@@ -83,6 +83,13 @@ class Query_Tree
 
       callback filters
 
+  get_Query_Tree_Filtered: (query_Id, filters, callback)=>
+    @.get_Query_Tree query_Id, (query_Tree)=>
+      if not filters
+        callback query_Tree
+      else
+        @.apply_Query_Tree_Query_Id_Filter query_Tree, filters, callback
+
   apply_Query_Tree_Query_Id_Filter: (query_Tree, query_Ids, callback)=>
     @.import_Service.query_Mappings.get_Queries_Mappings (queries_Mappings)=>
 
@@ -99,7 +106,7 @@ class Query_Tree
 
 
       if articles.empty()
-        return callback {} #query_Tree
+        return callback {}
 
       @.apply_Query_Tree_Articles_Filter query_Tree, articles, callback
 

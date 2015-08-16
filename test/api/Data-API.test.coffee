@@ -1,5 +1,6 @@
 TM_Server        = require '../../src/TM-Server'
 Swagger_Service  = require '../../src/services/rest/Swagger-Service'
+Swagger_Service  = require '../../src/services/rest/Swagger-Service'
 Data_API         = require '../../src/api/Data-API'
 
 describe '| api | Data-API.test', ->
@@ -96,6 +97,7 @@ describe '| api | Data-API.test', ->
         clientApi.id {id: article_Id }, (data)->
           data.obj[article_Id].assert_Is(article)
           done()
+
 
     it 'library_Query', (done)->
       clientApi.library_Query (data)->
@@ -313,4 +315,36 @@ describe '| api | Data-API.test', ->
           @.containers.assert_Not_Empty()
           assert_Is_Undefined @.results
           assert_Is_Undefined @.filters
+          done()
+
+
+    it 'query_view_model_filtered', (done)->
+      query_Id = 'query-2416c5861783'  # 'Authorization' query
+      from    = 0
+      to      = 10
+      clientApi.query_view_model id: query_Id, from: from, to: to, (data)->
+        using data.obj, ->
+          @._id      .assert_Is query_Id
+          @._filters .assert_Is ''
+          @._from    .assert_Is from
+          @._to      .assert_Is to
+          @.articles.assert_Size_Is to - from
+          @.filters.keys().assert_Is ['Technology', 'Phase', 'Type']
+          @.queries.assert_Size_Is 6
+          done()
+
+    it 'query_view_model_filtered', (done)->
+      query_Id = 'query-2416c5861783'  # 'Authorization' query
+      filters = 'query-8c511380a4f5'   # '.NET' filter
+      from    = 0
+      to      = 10
+      clientApi.query_view_model_filtered id: query_Id, filters: filters, from: from, to: to, (data)->
+        using data.obj, ->
+          @._id      .assert_Is query_Id
+          @._filters .assert_Is filters
+          @._from    .assert_Is from
+          @._to      .assert_Is to
+          @.articles.assert_Size_Is to - from
+          @.filters.keys().assert_Is ['Technology', 'Phase', 'Type']
+          @.queries.assert_Size_Is 6
           done()

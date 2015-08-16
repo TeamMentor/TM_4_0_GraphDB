@@ -22,7 +22,6 @@ describe '| services | text-search | Search-Artifacts-Service.test', ->
       done()
 
   it 'constructor',->
-    #library_Data.assert_Is_Object()
     search_Artifacts               .constructor.name.assert_Is 'Search_Artifacts_Service'
     search_Artifacts.import_Service.constructor.name.assert_Is 'ImportService'
     search_Artifacts.article       .constructor.name.assert_Is 'Article'

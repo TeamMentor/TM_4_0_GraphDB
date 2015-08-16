@@ -24,19 +24,24 @@ class Query_View_Model
 
   get_Filters: (query_Id, filters, callback)->
     @.query_Tree_Filtered query_Id, filters, (data)->
-      filters = []
+      filters = {}
       if data?.filters
         for filter in data.filters
-          results = []
-          filters.push title: filter.title, results: results
+          filters[filter.title] =  []
           for result in filter.results
             if result.size
-              results.push { id: result.id, title: result.title, size: result.size }
+              filters[filter.title].push { id: result.id, title: result.title, size: result.size }
       callback filters
 
   get_View_Model: (query_Id, filters, from, to, callback)=>
-    @.query_Tree_Filtered query_Id, filters, (query_tree)=>
+    @.query_Tree_Filtered query_Id, filters, (query_Tree)=>
+
+
+      if not query_Tree?.id
+        return callback {}
+
       view_Model = {}
+
       @.get_Articles query_Id, filters, from, to, (data_Articles)=>
         @.get_Filters query_Id, filters, (data_Filters)=>
           @.get_Queries query_Id, filters, (data_Queries)=>
@@ -45,11 +50,15 @@ class Query_View_Model
               @._filters = filters
               @._from    = from
               @._to      = to
-              @.id       = query_tree.id
-              @.title    = query_tree.title
-              @['articles'] = data_Articles
-              @['filters' ] = data_Filters
-              @['queries' ] = data_Queries
+
+              @.id       = query_Tree.id
+              @.title    = query_Tree.title
+              @.size     = query_Tree.results.size()
+
+              @.queries  = data_Queries
+              @.articles = data_Articles
+              @.filters  = data_Filters
+
               callback view_Model
 
 

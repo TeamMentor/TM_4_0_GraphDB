@@ -177,61 +177,6 @@ describe '| api | Data-API.test', ->
           query_Tree.id.assert_Is(query_Id )
           done()
 
-    it 'query_tree_articles', (done)->
-      @timeout 4000
-      clientApi.root_queries (data)=>
-        root_Queries = data.obj
-        query_Id = root_Queries.queries.first().id
-        from     = 0
-        to     = 30
-        clientApi.query_tree_articles { id: query_Id, from: from, to: to }, (data)=>
-          using data.obj,->
-            @.id.assert_Is query_Id
-            @.title.assert_Is 'Type'
-            @.results.assert_Size_Is to - from
-            @.size.assert_Is_Bigger_Than 1000
-
-            assert_Is_Undefined @.containers
-            assert_Is_Undefined @.filters
-
-            from = 2
-            to = 10
-            clientApi.query_tree_articles { id: query_Id, from: from, to: to }, (data_2)=>
-              data_2.obj.results.assert_Is data.obj.results.slice(from,to)
-              data_2.obj.results.assert_Size_Is to - from
-              done()
-
-    it 'query_tree_filters', (done)->
-      @timeout 4000
-      clientApi.root_queries (data)=>
-        root_Queries = data.obj
-        query_Id = root_Queries.queries.first().id
-        clientApi.query_tree_filters { id: query_Id }, (data)=>
-          using data.obj,->
-            @.id.assert_Is query_Id
-            @.title.assert_Is 'Type'
-            @.filters.assert_Not_Empty()
-            assert_Is_Undefined @.containers
-            assert_Is_Undefined @.results
-            done()
-
-    it 'query_tree_queries', (done)->
-      @timeout 4000
-      clientApi.root_queries (data)=>
-        root_Queries = data.obj
-        query_Id = root_Queries.queries.first().id
-        clientApi.query_tree_queries { id:query_Id }, (data)=>
-          using data.obj,->
-            @.assert_Is_Not {}
-            @.id.assert_Is query_Id
-            @.title.assert_Is 'Type'
-            @.containers.assert_Not_Empty()
-            assert_Is_Undefined @.results
-            assert_Is_Undefined @.filters
-            done()
-
-
-
     it 'query_tree_filtered (one filter)', (done)->
       @timeout 10000
       clientApi.root_queries (data)=>
@@ -266,57 +211,6 @@ describe '| api | Data-API.test', ->
           filters         = filter_Query_Id
           clientApi.query_tree_filtered {id: query_Id, filters: filters }, (data)=>
             done()
-
-
-    it 'query_tree_filtered_articles', (done)->
-      clientApi.root_queries (data)=>
-        query_Id = 'query-6234f2d47eb7'
-        filters  = 'query-184728a6e3ba'
-        from     = 0
-        to       = 10
-        clientApi.query_tree_filtered_articles {id: query_Id, filters: filters, from: from , to :to }, (data)=>
-          using data.obj,->
-            @.id.assert_Is query_Id
-            @.title.assert_Is 'Index'
-            @.results.assert_Size_Is to - from
-            @.size.assert_Is_Bigger_Than 50
-
-            assert_Is_Undefined @.containers
-            assert_Is_Undefined @.filters
-
-            from = 2
-            to = 10
-            clientApi.query_tree_filtered_articles {id: query_Id, filters: filters, from: from , to :to }, (data_2)=>
-              data_2.obj.results.assert_Is data.obj.results.slice(from,to)
-              data_2.obj.results.assert_Size_Is to - from
-              done()
-
-    it 'query_tree_filtered_filters', (done)->
-      query_Id = 'query-6234f2d47eb7'
-      filters  = 'query-184728a6e3ba'
-      clientApi.query_tree_filtered_filters { id: query_Id, filters:filters }, (data)=>
-        using data.obj,->
-          @.id.assert_Is query_Id
-          @.title.assert_Is 'Index'
-          @.filters.assert_Not_Empty()
-          assert_Is_Undefined @.containers
-          assert_Is_Undefined @.results
-          done()
-
-
-    it 'query_tree_filtered_queries', (done)->
-      query_Id = 'query-6234f2d47eb7'
-      filters  = 'query-184728a6e3ba'
-      clientApi.query_tree_filtered_queries { id: query_Id, filters:filters }, (data)=>
-        using data.obj,->
-          @.assert_Is_Not {}
-          @.id.assert_Is query_Id
-          @.title.assert_Is 'Index'
-          @.containers.assert_Not_Empty()
-          assert_Is_Undefined @.results
-          assert_Is_Undefined @.filters
-          done()
-
 
     it 'query_view_model_filtered', (done)->
       query_Id = 'query-2416c5861783'  # 'Authorization' query

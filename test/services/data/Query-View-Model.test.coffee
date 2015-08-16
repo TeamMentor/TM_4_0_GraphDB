@@ -79,10 +79,17 @@ describe '| services | data | Query-View-Model', ->
           @._filters .assert_Is filters
           @._from    .assert_Is from
           @._to      .assert_Is to
+          @.size     .assert_Is 71
           @.articles.assert_Size_Is to - from
           @.filters.keys().assert_Is ['Technology', 'Phase', 'Type']
           @.queries.assert_Size_Is 6
           done()
+
+  it 'get_View_Model (bad query)', (done)->
+    using new Query_View_Model(), ->
+      @.get_View_Model 'aaaa1234', null, null, null, (view_Model)->
+        view_Model.assert_Is {}
+        done()
 
   it 'query_Tree_Filtered', (done)->
     query_Id = 'query-2416c5861783'  # 'Authorization' query

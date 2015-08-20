@@ -5,13 +5,20 @@ class Search_Data_Parsing
     @.options                  = options || {}
     @.cache                    = @.options.cache || new Cache_Service("search_cache")
     @.key_Query_Mappings       = 'query_mappings.json'
-    @.key_article_Root_Queries = 'article_Root_Queries.json'
+    @.key_Articles             = 'articles.json'
+    @.key_Article_Ids          = 'article_Ids.json'
+    @.key_Article_Root_Queries = 'article_Root_Queries.json'
     @.index_Query_Id           = 'query-6234f2d47eb7'
+
+  map_Article_Ids: (callback)=>
+    if @.cache.has_Key(@.key_Articles) is false
+      return callback null
+    callback @.cache.get(@.key_Articles)?.json_Parse().keys()
 
   map_Article_Root_Queries: (callback)=>
 
     if @.cache.has_Key(@.key_Query_Mappings) is false
-      return null
+      return callback null
     query_Mappings = @.cache.get(@.key_Query_Mappings).json_Parse()
 
     article_Root_Queries = {}

@@ -1,3 +1,6 @@
+return
+
+
 class Search_Build
   {Cache_Service} = require('teammentor')
 

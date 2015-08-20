@@ -1,6 +1,8 @@
 Import_Service        = require './Import-Service'
 Search_Text_Service   = require '../text-search/Search-Text-Service'
-Search_Build          = require './Search-Build'
+#Search_Build          = require './Search-Build'
+Search                = require '../search/Search'
+
 Guid                  = require('teammentor').Guid
 
 class Search_Service
@@ -9,6 +11,7 @@ class Search_Service
     @.options       = options || {}
     @.importService = @.options.importService || new Import_Service(name:'tm-uno')
     @.graph         = @.importService.graph
+    @.search        = new Search()
 
   article_Titles: (callback)=>
     @.graph.db.nav('Article').archIn('is').as('id')
@@ -135,9 +138,15 @@ class Search_Service
 
 
   query_From_Text_Search: (text, callback)=>
-    query_Id = @query_Id_From_Text text
-    new Search_Build().create_Search_TreeView text, ->
+    #query_Id = @query_Id_From_Text text
+    @.search.query_Id_For_Text text, (query_Id)=>
+      console.log '---------: ' + query_Id
       callback query_Id
+
+    return
+    #query_Id = @query_Id_From_Text text
+    #new Search_Build().create_Search_TreeView text, ->
+    #  callback query_Id
 
     return
     @.map_Text_Search_Articles text, (query_Id)=>

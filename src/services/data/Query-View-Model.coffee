@@ -61,7 +61,7 @@ class Query_View_Model
               callback view_Model
 
   query_Tree_Cache_Key: (query_Id, filters)=>
-    "query_tree__#{query_Id}#{if filters then '_'  else ''}#{filters || ''}.json"
+    "query_tree_#{query_Id}#{if filters then '_'  else ''}#{filters || ''}.json"
 
   query_Tree_Filtered: (query_Id, filters, callback)=>
     @.query_Tree_Filtered_from_Cache query_Id, filters, (data)=>

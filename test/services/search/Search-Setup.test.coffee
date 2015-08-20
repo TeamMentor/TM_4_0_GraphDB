@@ -11,7 +11,7 @@ describe 'Search-Setup', ->
       @.query_Mappings.constructor.name.assert_Is 'Query_Mappings'
 
       @.key_Articles            .assert_Is 'articles.json'
-      @.key_article_Root_Queries.assert_Is 'article_Root_Queries.json'
+      @.key_Article_Root_Queries.assert_Is 'article_Root_Queries.json'
       @.key_Query_Mappings      .assert_Is 'query_mappings.json'
       @.key_Tags_Mappings       .assert_Is 'tags_mappings.json'
 
@@ -29,13 +29,23 @@ describe 'Search-Setup', ->
         @.cache.has_Key(@.key_Articles).assert_Is_True()
         done()
 
+
+  it 'create_Article_Ids', (done)->
+    @.timeout 3000
+    using new Search_Setup(),->
+      @.create_Article_Ids (data)=>
+        data.first().assert_Contains 'article-'
+        data.assert_Size_Is_Bigger_Than 2000
+        @.cache.has_Key(@.key_Article_Ids).assert_Is_True()
+        done()
+
   it 'create_Article_Root_Queries', (done)->
     @.timeout 3000
     using new Search_Setup(),->
       @.create_Article_Root_Queries (data)=>
         data.keys().first().assert_Contains 'article-'
         data.keys().assert_Size_Is_Bigger_Than 2000
-        @.cache.has_Key(@.key_Articles).assert_Is_True()
+        @.cache.has_Key(@.key_Article_Root_Queries).assert_Is_True()
         done()
 
   it 'create_Query_Mappings', (done)->

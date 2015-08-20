@@ -55,8 +55,8 @@ class Swagger_GraphDB extends Swagger_Common
           logger?.error "Got #{message} when saving cache key #{key}"
 
   send_From_Cache: (res, key, callback)=>
-    if local_Cache[key]                                   # use in memory cache if data has been loaded before
-      return res.json local_Cache[key]
+    #if local_Cache[key]                                   # use in memory cache if data has been loaded before
+    #  return res.json local_Cache[key]
 
     if @.cache_Has_Key(key)
       data = @.cache.get(key)?.json_Parse()               # although this is only reading from the file system, it will take an extra 5 to 10ms per request (or larger file)

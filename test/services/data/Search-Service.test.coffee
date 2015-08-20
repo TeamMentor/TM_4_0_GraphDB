@@ -95,3 +95,17 @@ describe '| services | data | Search-Service.test |', ->
       importService.graph_Find.get_Subject_Data query_Id, (data)->
         data.title.lower().assert_Is text.lower()
         done();
+
+  xit 'Check that parent queries are mapped', (done)->
+    @.timeout 10000
+    #query = 'search-jsp-debug'
+    text = 'jsp debug'
+    searchService.query_From_Text_Search text, (query_Id)->
+      #searchService.map_Search_Parent_Queries query_Id, (data)->
+      #  searchService.create_Search_Parent_Queries_Nodes query_Id, data, (result)->
+      #    console.log result
+          done()
+  xit 'Check that query tree for 53bb1a85ee3a', (done)->
+    searchService.get_Query_Tree 'query-53bb1a85ee3a', (data)->
+      console.log data
+      done()

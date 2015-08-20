@@ -36,7 +36,9 @@ class Query_Mappings
           add_Root_Queries_To_Queries_Mappings()
 
   get_Queries_Mappings: (callback)=>
-    (callback(Local_Cache.Queries_Mappings);return) if (Local_Cache.Queries_Mappings)
+    if (Local_Cache.Queries_Mappings)
+      return callback(Local_Cache.Queries_Mappings)
+
     @.graph_Find.find_Queries (query_Ids)=>
       @.graph_Find.get_Subjects_Data query_Ids, (queries)=>
 
@@ -100,7 +102,7 @@ class Query_Mappings
         callback(queries)
 
   get_Query_Mappings: (query_Id,callback)=>
-    @get_Queries_Mappings (queries_Mappings)=>
+    @.get_Queries_Mappings (queries_Mappings)=>
       callback queries_Mappings[query_Id]
 
   update_Query_Mappings_With_Search_Id: (query_Id, callback)=>

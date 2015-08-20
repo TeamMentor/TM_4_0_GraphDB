@@ -35,7 +35,7 @@ class Query_Tree
           container =
             id      : query?.id
             title   : query?.title
-            size    : query?.articles.size()
+            size    : query?.articles?.size()
             articles: query?.articles
 
           query_Tree.containers.add container

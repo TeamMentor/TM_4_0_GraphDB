@@ -27,18 +27,18 @@ class Query_View_Model
       filters = {}
       if data?.filters
         for filter in data.filters
-          filters[filter.title] =  []
-          for result in filter.results
-            if result.size
-              filters[filter.title].push { id: result.id, title: result.title, size: result.size }
+          if filter
+            filters[filter.title] =  []
+            if filter.results
+              for result in filter.results
+                if result.size
+                  filters[filter.title].push { id: result.id, title: result.title, size: result.size }
       callback filters
 
   get_View_Model: (query_Id, filters, from, to, callback)=>
     @.query_Tree_Filtered query_Id, filters, (query_Tree)=>
-
-
-      if not query_Tree?.id
-        return callback {}
+      if not query_Tree?.id or query_Tree.id isnt query_Id
+        return callback { cache_Key: @.query_Tree_Cache_Key(query_Id, filters) }
 
       view_Model = {}
 
@@ -46,14 +46,13 @@ class Query_View_Model
         @.get_Filters query_Id, filters, (data_Filters)=>
           @.get_Queries query_Id, filters, (data_Queries)=>
             using view_Model, ->
-              @._id      = query_Id
               @._filters = filters
               @._from    = from
               @._to      = to
 
               @.id       = query_Tree.id
               @.title    = query_Tree.title
-              @.size     = query_Tree.results.size()
+              @.size     = query_Tree.results?.size()
 
               @.queries  = data_Queries
               @.articles = data_Articles
@@ -61,7 +60,8 @@ class Query_View_Model
 
               callback view_Model
 
-
+  query_Tree_Cache_Key: (query_Id, filters)=>
+    "query_tree__#{query_Id}#{if filters then '_'  else ''}#{filters || ''}.json"
 
   query_Tree_Filtered: (query_Id, filters, callback)=>
     @.query_Tree_Filtered_from_Cache query_Id, filters, (data)=>
@@ -71,12 +71,12 @@ class Query_View_Model
         @.query_Tree_Filtered_from_GraphDB query_Id, filters, callback
 
   query_Tree_Filtered_from_Cache: (query_Id, filters, callback)=>
-    cache_Key = "query_tree__#{query_Id}_#{filters || ''}.json"
+    cache_Key = @.query_Tree_Cache_Key query_Id, filters
     callback @.cache.get(cache_Key)?.json_Parse()
 
 
   query_Tree_Filtered_from_GraphDB: (query_Id, filters, callback)=>
-    cache_Key = "query_tree__#{query_Id}_#{filters || ''}.json"
+    cache_Key = @.query_Tree_Cache_Key query_Id, filters
     @.open_Import_Service (import_Service)=>
       if import_Service
         if @.cache.has_Key cache_Key                                    # in case the query ID has been added to the cache while wait_For_Unlocked_DB was running
@@ -102,5 +102,6 @@ class Query_View_Model
       unload_Fail = ->
         callback null
       import_Service.graph.wait_For_Unlocked_DB unlock_Ok, unload_Fail
+
 
 module.exports = Query_View_Model

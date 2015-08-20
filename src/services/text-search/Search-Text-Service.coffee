@@ -16,7 +16,6 @@ class Search_Text_Service
     @.options             = options || {}
     @.importService       = @.options.importService
     @.cache_Search        = new Cache_Service("search_cache")
-
     @.folder_Lib_UNO_Json = global.config?.tm_graph?.folder_Lib_UNO_Json
 
   folder_Search_Data: ()=>
@@ -24,7 +23,6 @@ class Search_Text_Service
 
 
   search_Mappings: (callback)=>
-    console.log @folder_Search_Data()
 
     if loaded_Search_Mappings
       return callback loaded_Search_Mappings

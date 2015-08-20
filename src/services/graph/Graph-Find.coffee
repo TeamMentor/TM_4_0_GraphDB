@@ -206,8 +206,7 @@ class Graph_Find
 
   get_Subjects_Data:(subjects, callback)=>
     if @graph.db is null
-      callback null
-      return
+      return callback null
     result = {}
     if not subjects
       callback result
@@ -223,6 +222,8 @@ class Graph_Find
     async.each subjects, map_Subject_data, -> callback(result)
 
   find_Tags: (callback)=>
+    if @.graph.db is null
+      return callback {}
     @.graph.query 'predicate','tags', (data)=>
       tag_Data = {}
       if data

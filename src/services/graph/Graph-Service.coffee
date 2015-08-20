@@ -3,6 +3,7 @@ levelgraph      = null
 GitHub_Service  = null
 async           = require 'async'
 path            = require 'path'
+domain          = require 'domain'
 
 class Graph_Service
 
@@ -70,6 +71,25 @@ class Graph_Service
       else
         callback_Ok()
     check_Lock()
+
+  exec_In_DB: (action, callback)=>
+    exec_Domain = domain.create()                  # create a domain to execute 'action' function
+    exec_Domain.on 'error', (er)=>                 # catch errors thrown inside 'action'
+      console.log('[exec_In_DB][async error]', er) # log the error
+      @.closeDb =>                                 # ensure the db is closed
+        callback null                              # send back an null value
+
+    exec_Domain.run () =>                          # start the domain (which will catch any async exceptions)
+      @.openDb (status)=>                          # open the DB
+        if not status                              # if DB can't be opened
+          return callback null                     # send back an null value
+
+        action (data)=>                            # call 'action' function
+          @.closeDb =>                             # close db
+            callback(data)                         # send back data received
+
+
+
 
   # Refactor move to different file
 

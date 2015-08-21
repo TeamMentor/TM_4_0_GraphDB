@@ -11,7 +11,7 @@ if not global.config
 Search_Text_Service = require './../../../src/services/search/Search-Text'
 
 
-describe.only '| services | text-search | Search-Text..', ->
+describe '| services | text-search | Search-Text..', ->
 
   search_Text = null
 

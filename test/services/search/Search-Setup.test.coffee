@@ -18,6 +18,18 @@ describe 'Search-Setup', ->
       @.cache             .cacheFolder().assert_Folder_Exists()
       @.cache.area        .assert_Is 'search_cache'
 
+  it.only 'build_All', (done)->
+    @.timeout 5000
+    using new Search_Setup(),->
+      #@.clear_All()
+      @.build_All =>
+        @.cache.has_Key(@.key_Articles            ).assert_Is_True()  # check in the order they were built
+        @.cache.has_Key(@.key_Article_Ids         ).assert_Is_True()
+        @.cache.has_Key(@.key_Query_Mappings      ).assert_Is_True()
+        @.cache.has_Key(@.key_Article_Root_Queries).assert_Is_True()
+        @.cache.has_Key(@.key_Tags_Mappings       ).assert_Is_True()
+        done()
+
 
   it 'create_Articles', (done)->
     @.timeout 3000
@@ -40,7 +52,6 @@ describe 'Search-Setup', ->
         done()
 
   it 'create_Article_Root_Queries', (done)->
-    @.timeout 3000
     using new Search_Setup(),->
       @.create_Article_Root_Queries (data)=>
         data.keys().first().assert_Contains 'article-'

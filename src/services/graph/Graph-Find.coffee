@@ -181,6 +181,11 @@ class Graph_Find
                            .solutions (err,data) ->
                               callback (item.query for item in data)
 
+
+  get_Articles_Data: (callback)=>
+    @.find_Using_Is 'Article', (articles_Ids)=>
+      @.get_Subjects_Data articles_Ids, callback
+
   get_Subject_Data: (subject, callback)=>
     if @graph.db is null
       callback null

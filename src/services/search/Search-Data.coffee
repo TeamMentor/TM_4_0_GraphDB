@@ -6,7 +6,7 @@ class Search_Data
     @.cache         = @.options.cache || new Cache_Service("search_cache")
     @.key_Articles             = 'articles.json'
     @.key_Article_Ids          = 'article_Ids.json'
-    @.key_article_Root_Queries =  'article_Root_Queries.json'
+    @.key_Article_Root_Queries = 'article_Root_Queries.json'
     @.key_Query_Mappings       = 'query_mappings.json'
     @.key_Tags_Mappings        = 'tags_mappings.json'
 
@@ -20,7 +20,7 @@ class Search_Data
 
   articles            : => @.get_Data @.key_Articles
   article_Ids         : => @.get_Data @.key_Article_Ids
-  article_Root_Queries: => @.get_Data @.key_article_Root_Queries
+  article_Root_Queries: => @.get_Data @.key_Article_Root_Queries
   query_Mappings      : => @.get_Data @.key_Query_Mappings
   tag_Mappings        : => @.get_Data @.key_Tags_Mappings
 

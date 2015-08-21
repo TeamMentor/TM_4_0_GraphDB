@@ -7,7 +7,7 @@ describe 'Search-Data', ->
       @.cache.cacheFolder().assert_Folder_Exists()
       @.cache.area.assert_Is 'search_cache'
 
-      @.key_article_Root_Queries.assert_Is 'article_Root_Queries.json'
+      @.key_Article_Root_Queries.assert_Is 'article_Root_Queries.json'
 
   it 'get_Data', ->
     using new Search_Data(),->

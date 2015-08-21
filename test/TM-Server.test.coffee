@@ -14,15 +14,31 @@ describe '| test-Server |',->
     port = 10000 + 10000.random()
     server = new TM_Server({ port : port} ).configure()
 
-  it 'check ctor', ->
-      expect(TM_Server     ).to.be.an('function')
-      expect(server        ).to.be.an('object'  )
-      expect(server.app    ).to.be.an('function')
-      expect(server.port   ).to.be.an('number'  )
-      expect(server._server).to.equal(null)
+  it.only 'check ctor', ->
+    using new TM_Server(),->
+      @.options.assert_Is {}
+      @.app.constructor.name.assert_Is 'EventEmitter'
+      @.port.assert_Is_Number()
+      @.search_Setup.constructor.name.assert_Is 'Search_Setup'
+      @.log_All_Requests.assert_Is_True()
+      assert_Is_Null @._server
+      assert_Is_Null @.logging_Service
 
-      #expect(server.addRoutes    ).to.be.an('function')
-      #expect(server.addControlers).to.be.an('function')
+      @.enable_Logging  .assert_Is_Function()
+      @.run_Search_Setup.assert_Is_Function()
+      @.start           .assert_Is_Function()
+      @.stop            .assert_Is_Function()
+      @.url             .assert_Is_Function()
+      @.routes          .assert_Is_Function()
+
+  it.only 'search_Setup', (done)=>
+    using new TM_Server(),->
+      @.search_Setup.cache.delete @.search_Setup.key_Article_Root_Queries
+      @.search_Setup.cache.has_Key(@.search_Setup.key_Article_Root_Queries).assert_Is_False()
+      @.run_Search_Setup =>
+        @.search_Setup.cache.has_Key(@.search_Setup.key_Article_Root_Queries).assert_Is_True()
+        done()
+
 
   it 'start and stop', (done)->
       expect(server.start  ).to.be.an('function')

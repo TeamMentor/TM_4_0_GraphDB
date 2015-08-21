@@ -30,7 +30,6 @@ class Search_Data_Parsing
       if query_Data.parents?.first() is @.index_Query_Id
         for article_Id in query_Data.articles
           add_Article_Mapping article_Id, query_Id, query_Data.title
-
     callback article_Root_Queries
 
 

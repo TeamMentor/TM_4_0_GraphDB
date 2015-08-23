@@ -54,6 +54,14 @@ describe 'Search-Data', ->
         @.keys().first()  .assert_Contains 'query-'
         @.values().first().title.assert_Is_String()
 
+  it 'query_Titles', ->
+    using new Search_Data(),->
+      using @.query_Titles(), ->
+        @.keys()          .assert_Size_Is_Bigger_Than 20
+        @.keys().first()  .assert_Not_Contains 'query-'
+        @.values().first().assert_Contains 'query-'
+
+
   it 'tag_Mappings', ->
     using new Search_Data(),->
       @.tag_Mappings().keys() .assert_Size_Is_Bigger_Than 20

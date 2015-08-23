@@ -1,4 +1,7 @@
+return
 
+# This code ended up being quite expensive from a DB query point og view
+# replaced initially by Search-Query-Tree
 class Query_Tree
 
   constructor: (import_Service)->

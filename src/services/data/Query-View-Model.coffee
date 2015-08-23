@@ -1,12 +1,16 @@
 {Cache_Service} = require('teammentor')
-Import_Service  = require './Import-Service'
+#Import_Service  = require './Import-Service'
+Search_Query_Tree= require '../search/Search-Query-Tree'
+Query_Tree       = require '../query-tree/Query-Tree'
 
 class Query_View_Model
   constructor: (options)->
-    @.options       = options || {}
-    @.cache         = @.options.cache || new Cache_Service("data_cache")
-    @.db_Name       = @.options.db_Name || 'tm-uno'
-    @.graph_Options = name: @.db_Name
+    @.options           = options || {}
+    @.cache             = @.options.cache || new Cache_Service("data_cache")
+    @.search_Query_Tree = new Search_Query_Tree()
+    @.query_Tree        = new Query_Tree()
+    #@.db_Name       = @.options.db_Name || 'tm-uno'
+    #@.graph_Options = name: @.db_Name
 
   get_Articles: (query_Id, filters, from, to, callback)->
     @.query_Tree_Filtered query_Id, filters, (data)->
@@ -64,44 +68,51 @@ class Query_View_Model
     "query_tree_#{query_Id}#{if filters then '_'  else ''}#{filters || ''}.json"
 
   query_Tree_Filtered: (query_Id, filters, callback)=>
-    @.query_Tree_Filtered_from_Cache query_Id, filters, (data)=>
-      if data
-        callback data
-      else
-        @.query_Tree_Filtered_from_GraphDB query_Id, filters, callback
+    @.query_Tree.get_Query_Tree_Filtered query_Id, filters, callback
 
-  query_Tree_Filtered_from_Cache: (query_Id, filters, callback)=>
-    cache_Key = @.query_Tree_Cache_Key query_Id, filters
-    callback @.cache.get(cache_Key)?.json_Parse()
+#    @.query_Tree_Filtered_from_Cache query_Id, filters, (data)=>
+#      if data
+#        callback data
+#      else
+#        callback()
+#        #@.query_Tree_Filtered_from_GraphDB query_Id, filters, callback
 
+#  query_Tree_Filtered_from_Cache: (query_Id, filters, callback)=>
+#    cache_Key = @.query_Tree_Cache_Key query_Id, filters
+#    callback @.cache.get(cache_Key)?.json_Parse()
+#
+#  query_Tree_Filtered_from_Query_Id: (query_Id, filters, callback)=>
+#    @.search_Query_Tree.create_Query_Tree_For_Query_Id query_Id , (data)=>
+#      console.log data
+#      callback data
 
-  query_Tree_Filtered_from_GraphDB: (query_Id, filters, callback)=>
-    cache_Key = @.query_Tree_Cache_Key query_Id, filters
-    @.open_Import_Service (import_Service)=>
-      if import_Service
-        if @.cache.has_Key cache_Key                                    # in case the query ID has been added to the cache while wait_For_Unlocked_DB was running
-          import_Service.graph.closeDb =>                              # close the DB and
-            @.query_Tree_Filtered_from_Cache query_Id, filters, callback              # send the data from the cache
-        else
-          import_Service.query_Tree.get_Query_Tree_Filtered query_Id, filters, (data)=>
-            import_Service.graph.closeDb =>
-              if data and data.id
-                @.cache.put cache_Key,data
-              callback data
-      else callback null
+#  query_Tree_Filtered_from_GraphDB: (query_Id, filters, callback)=>
+#    cache_Key = @.query_Tree_Cache_Key query_Id, filters
+#    @.open_Import_Service (import_Service)=>
+#      if import_Service
+#        if @.cache.has_Key cache_Key                                    # in case the query ID has been added to the cache while wait_For_Unlocked_DB was running
+#          import_Service.graph.closeDb =>                              # close the DB and
+#            @.query_Tree_Filtered_from_Cache query_Id, filters, callback              # send the data from the cache
+#        else
+#          import_Service.query_Tree.get_Query_Tree_Filtered query_Id, filters, (data)=>
+#            import_Service.graph.closeDb =>
+#              if data and data.id
+#                @.cache.put cache_Key,data
+#              callback data
+#      else callback null
 
-  open_Import_Service: (callback)=>
-      import_Service = new Import_Service(@.graph_Options)
-      unlock_Ok = ->
-        import_Service.graph.openDb (status)=>
-          status = true
-          if status
-            callback import_Service
-          else
-            callback null
-      unload_Fail = ->
-        callback null
-      import_Service.graph.wait_For_Unlocked_DB unlock_Ok, unload_Fail
+#  open_Import_Service: (callback)=>
+#      import_Service = new Import_Service(@.graph_Options)
+#      unlock_Ok = ->
+#        import_Service.graph.openDb (status)=>
+#          status = true
+#          if status
+#            callback import_Service
+#          else
+#            callback null
+#      unload_Fail = ->
+#        callback null
+#      import_Service.graph.wait_For_Unlocked_DB unlock_Ok, unload_Fail
 
 
 module.exports = Query_View_Model

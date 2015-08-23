@@ -105,6 +105,13 @@ class Query_Mappings
     @.get_Queries_Mappings (queries_Mappings)=>
       callback queries_Mappings[query_Id]
 
+  get_Query_Titles: (callback)=>
+    @.get_Queries_Mappings (query_Mappings)=>
+      query_Titles = {}
+      for query_Id, query of query_Mappings
+        query_Titles[query.title] = query_Id
+      callback query_Titles
+
   update_Query_Mappings_With_Search_Id: (query_Id, callback)=>
     @get_Queries_Mappings (queries_Mappings)=>
       @.graph_Find.get_Subject_Data query_Id, (query_Data)=>

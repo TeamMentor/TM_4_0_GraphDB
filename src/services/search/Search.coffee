@@ -10,7 +10,7 @@ class Search
   query_Id_From_Text: (text)=>
     "search-#{text.trim().to_Safe_String()}"
 
-  query_Id_For_Text: (text, callback)=>
+  map_Search_Results_For_Text: (text, callback)=>
 
     text = text.lower()
 

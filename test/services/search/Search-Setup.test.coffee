@@ -13,12 +13,13 @@ describe 'Search-Setup', ->
       @.key_Articles            .assert_Is 'articles.json'
       @.key_Article_Root_Queries.assert_Is 'article_Root_Queries.json'
       @.key_Query_Mappings      .assert_Is 'query_mappings.json'
+      @.key_Query_Titles        .assert_Is 'query_titles.json'
       @.key_Tags_Mappings       .assert_Is 'tags_mappings.json'
 
       @.cache             .cacheFolder().assert_Folder_Exists()
       @.cache.area        .assert_Is 'search_cache'
 
-  it.only 'build_All', (done)->
+  it 'build_All', (done)->
     @.timeout 5000
     using new Search_Setup(),->
       #@.clear_All()
@@ -26,6 +27,7 @@ describe 'Search-Setup', ->
         @.cache.has_Key(@.key_Articles            ).assert_Is_True()  # check in the order they were built
         @.cache.has_Key(@.key_Article_Ids         ).assert_Is_True()
         @.cache.has_Key(@.key_Query_Mappings      ).assert_Is_True()
+        @.cache.has_Key(@.key_Query_Titles        ).assert_Is_True()
         @.cache.has_Key(@.key_Article_Root_Queries).assert_Is_True()
         @.cache.has_Key(@.key_Tags_Mappings       ).assert_Is_True()
         done()
@@ -64,6 +66,16 @@ describe 'Search-Setup', ->
       #@.cache.delete(key).assert_Is_True()
       @.create_Query_Mappings (data)=>
         data.keys().first().assert_Contains 'query-'
+        data.keys().assert_Size_Is_Bigger_Than 250
+        @.cache.has_Key(@.key_Query_Mappings).assert_Is_True()
+        done()
+
+  it 'create_Query_Titles', (done)->
+    using new Search_Setup(),->
+      @.create_Query_Titles (data)=>
+        data.keys().first().assert_Not_Contains 'query-'
+        data[data.keys().first()].assert_Contains 'query-'
+
         data.keys().assert_Size_Is_Bigger_Than 250
         @.cache.has_Key(@.key_Query_Mappings).assert_Is_True()
         done()

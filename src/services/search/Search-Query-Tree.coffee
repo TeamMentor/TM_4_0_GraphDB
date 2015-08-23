@@ -11,27 +11,49 @@ class Search_Query_Tree
 
     @.raw_Articles           = @.search_Data.articles()
     @.query_Mappings         = @.search_Data.query_Mappings()
-    @article_Root_Queries    = @.search_Data.article_Root_Queries()
+    @.article_Root_Queries   = @.search_Data.article_Root_Queries()
 
   cache_Key: (query_Id, filters)=>
     "query_tree_#{query_Id}#{if filters then '_'  else ''}#{filters || ''}.json"
 
+  # in this mode the queries are calculated from the query_Mapping
+  create_Query_Tree_For_Query_Id: (query_Id , callback)=>
+    query_Mapping = @.query_Mappings[query_Id]
+    if not query_Mapping
+      return callback {}
+
+    cache_Key    = @.cache_Key(query_Id, null)
+    title        = query_Mapping.title
+    article_Ids  = query_Mapping.articles
+    articles     = @.map_Articles article_Ids
+    containers   = @.map_Queries_For_Query query_Id
+    filters      = @.map_Filters  article_Ids
+
+    callback @.save_Query_Tree query_Id, title, containers, articles, filters, cache_Key
+
+  # in this mode the queries are calculated from the articles
   create_Query_Tree_For_Articles: (query_Id, title, cache_Key, article_Ids, callback)=>
+    articles    = @.map_Articles article_Ids
+    containers  = @.map_Queries article_Ids
+    filters     = @.map_Filters article_Ids
+    callback @.save_Query_Tree query_Id, title, containers, articles, filters, cache_Key
 
-    containers = []
-    articles   = []
-    filters    = []
-
+  map_Articles: (article_Ids)=>
+    articles = []
     for article_Id in article_Ids
       article = @.raw_Articles[article_Id]
       if article
         articles.push article
+    return articles
 
-    containers = @.map_Queries article_Ids
+  map_Queries_For_Query: (query_Id)=>
+    queries = []
+    query_Mapping = @.query_Mappings[query_Id]
+    if query_Mapping
+      for query in query_Mapping.queries
+        queries.push { id : query.id , title: query.title, size: query.articles.size(), articles:query.articles }
+    return queries
 
-    filters    = @.map_Filters article_Ids
-
-    callback @.save_Query_Tree query_Id, title, containers, articles, filters, cache_Key
 
   map_Queries: (article_Ids)=>
 
@@ -49,7 +71,9 @@ class Search_Query_Tree
     return queries.values()
 
   map_Filters: (article_Ids)=>
-    articles = []
+
+    articles     = []
+    query_Titles = @.search_Data.query_Titles()
 
     for article_Id in article_Ids
       article = @.raw_Articles[article_Id]
@@ -63,25 +87,22 @@ class Search_Query_Tree
     for article in articles
       if article
         if article.technology
-          technology[article.technology]?= 0
-          technology[article.technology]++
+          technology[article.technology]?= []
+          technology[article.technology].push article.id
         if article.type
-          type[article.type]?= 0
-          type[article.type]++
+          type[article.type]?= []
+          type[article.type].push article.id
         if article.phase
-          phase[article.phase]?= 0
-          phase[article.phase]++
+          phase[article.phase]?= []
+          phase[article.phase].push article.id
 
         raw_filters = { Technology: [] , Type: [] , Phase: []}
         for key,value of technology
-          query = @.resolve_Query_From_Title(key) || {}
-          raw_filters.Technology.push { id: query.id, title: key, size: value}
+          raw_filters.Technology.push { id: query_Titles[key], title: key, size: value.size() , articles: value}
         for key,value of type
-          query = @.resolve_Query_From_Title(key) || {}
-          raw_filters.Type.push { id:  query.id , title: key, size: value}
+          raw_filters.Type.push       { id: query_Titles[key], title: key, size: value.size(), articles: value}
         for key,value of phase
-          query = @.resolve_Query_From_Title(key) || {}
-          raw_filters.Phase.push { id: query.id, title: key, size: value}
+          raw_filters.Phase.push      { id: query_Titles[key], title: key, size: value.size() , articles: value}
 
         filters = []
         filters.push title: 'Technology', results: raw_filters.Technology
@@ -91,6 +112,8 @@ class Search_Query_Tree
     return filters
 
   resolve_Query_From_Title: (title)=>
+    return query_Titles[title]
+
     for query_Id, query of @.query_Mappings
       if query.title is title
         return query
@@ -108,6 +131,5 @@ class Search_Query_Tree
 
     @.data_Cache.put key, query_Tree
     return query_Tree
-
 
 module.exports = Search_Query_Tree

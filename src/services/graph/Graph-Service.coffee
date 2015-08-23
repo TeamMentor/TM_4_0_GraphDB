@@ -34,12 +34,14 @@ class Graph_Service
     else
       locked = true
       process.nextTick =>
+        console.log '***[Graph-Service]*** open db'
         @.ensure_TM_Uno_Is_Loaded =>
           @.db = levelgraph(levelup(@dbPath))
           process.nextTick =>
             callback true
 
   closeDb: (callback)=>
+    console.log '***[Graph-Service]*** close db'
     if (@db)
       @db.close =>
         @db    = null

@@ -30,8 +30,22 @@ describe '| api | Search-API.test', ->
       done()
 
   it 'constructor', ->
-    searchApi.assert_Is_Object()
-    searchApi.options.area.assert_Is 'search'
+    using new Search_API(), ->
+      @.options.area            .assert_Is 'search'
+      @.search.constructor.name .assert_Is 'Search'
+
+      # inherired from Swagger_GraphDB
+      @.cache.area              .assert_Is 'data_cache'
+      @.cache_Enabled           .assert_Is_True()
+      @.db_Name                 .assert_Is 'tm-uno'
+      @.graph_Options           .assert_Is name : 'tm-uno'
+
+      # inherited from Swagger_Common
+      @.area                    .assert_Is 'search'
+      assert_Is_Undefined @.swaggerService
+
+
+
 
   it 'check search section exists', (done)->
     swaggerService.url_Api_Docs.GET_Json (docs)->
@@ -66,18 +80,25 @@ describe '| api | Search-API.test', ->
       title.title.assert_Is_String()
       done()
 
-  # see https://github.com/TeamMentor/TM_4_0_Design/issues/521
-  # doesn't work until the search data is parsed and loaded. This should be fixed in an improved version of the search cache
-  #it 'query_from_text_search', (done)->
-  #  text = 'access'
-  #  clientApi.query_from_text_search { text: text}, (data)->
-  #    data.obj.assert_Is "search-#{text}"
-  #    done()
 
-  # see https://github.com/TeamMentor/TM_4_0_Design/issues/521
-  # doesn't work until the search data is parsed and loaded. This should be fixed in an improved version of the search cache
-  #it 'word_score', (done)->
-  #  word = 'injection'
-  #  clientApi.word_score { word: word}, (data)->
-  #    log data.obj
-  #    done()
+  it 'query_from_text_search', (done)->
+    search_Query_Tree = searchApi.search.search_Query_Tree
+
+    text     = 'java'
+    query_Id  = 'search-java'
+    cache_Key = search_Query_Tree.cache_Key query_Id
+
+    search_Query_Tree.data_Cache.delete cache_Key
+    search_Query_Tree.data_Cache.has_Key(cache_Key).assert_Is_False()
+
+
+    clientApi.query_from_text_search text: text, (data)->
+      data.obj.assert_Is query_Id
+      search_Query_Tree.data_Cache.has_Key(cache_Key).assert_Is_True()
+      done()
+
+  it 'word_score', (done)->
+    word = 'java'
+    clientApi.word_score { word: word}, (data)->
+      data.obj.assert_Size_Is_Bigger_Than 300
+      done()

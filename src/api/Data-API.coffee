@@ -2,6 +2,8 @@ GraphDB_API          = require '../../src/api/GraphDB-API'
 Swagger_GraphDB      = require './base-classes/Swagger-GraphDB'
 Article              = require '../graph/Article'
 Query_View_Model     = require '../../src/services/data/Query-View-Model'
+Search_Query_Tree    = require '../../src/services/search/Search-Query-Tree'
+Query_Tree           = require '../../src/services/query-tree/Query-Tree'
 
 class Data_API extends Swagger_GraphDB
   constructor: (options)->
@@ -104,19 +106,25 @@ class Data_API extends Swagger_GraphDB
 
   query_tree: (req,res)=>
     id        = req.params.id
-    cache_Key = "query_tree_#{id}.json"
-    @open_Import_Service res, cache_Key, (import_Service)=>
-      import_Service.query_Tree.get_Query_Tree id, (data)=>
-        @close_Import_Service_and_Send import_Service, res, data, cache_Key
+    new Query_Tree().get_Query_Tree id, (data)->
+      res.json(data)
+#      return
+#      cache_Key = "query_tree_#{id}.json"
+#      @open_Import_Service res, cache_Key, (import_Service)=>
+#        import_Service.query_Tree.get_Query_Tree id, (data)=>
+#          @close_Import_Service_and_Send import_Service, res, data, cache_Key
 
   query_tree_filtered: (req,res)=>
     id       = req.params.id
     filters  = req.params.filters
-    cache_Key = "query_tree_filtered_#{id}_#{filters}.json"
-    @.using_Query_Tree res, cache_Key, (send)->
-      @.get_Query_Tree id, (query_Tree)=>
-        @.apply_Query_Tree_Query_Id_Filter query_Tree, filters, (data)=>
-          send data
+    id        = req.params.id
+    new Query_Tree().get_Query_Tree_Filtered id, filters, (data)->
+      res.json(data)
+    #cache_Key = "query_tree_filtered_#{id}_#{filters}.json"
+#    @.using_Query_Tree res, cache_Key, (send)->
+#      @.get_Query_Tree id, (query_Tree)=>
+#        @.apply_Query_Tree_Query_Id_Filter query_Tree, filters, (data)=>
+#          send data
 
   query_view_model: (req,res)=>
     id       = req.params.id

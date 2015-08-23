@@ -8,6 +8,7 @@ class Search_Data
     @.key_Article_Ids          = 'article_Ids.json'
     @.key_Article_Root_Queries = 'article_Root_Queries.json'
     @.key_Query_Mappings       = 'query_mappings.json'
+    @.key_Query_Titles         = 'query_titles.json'
     @.key_Tags_Mappings        = 'tags_mappings.json'
 
   get_Data: (key_Name)->
@@ -22,6 +23,7 @@ class Search_Data
   article_Ids         : => @.get_Data @.key_Article_Ids
   article_Root_Queries: => @.get_Data @.key_Article_Root_Queries
   query_Mappings      : => @.get_Data @.key_Query_Mappings
+  query_Titles        : => @.get_Data @.key_Query_Titles
   tag_Mappings        : => @.get_Data @.key_Tags_Mappings
 
 

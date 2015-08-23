@@ -1,6 +1,6 @@
 Search_Query_Tree = require '../../../src/services/search/Search-Query-Tree'
 
-describe.only '| services | Search_Query_Tree', ->
+describe '| services | Search_Query_Tree', ->
   it 'constructor', ->
     using new Search_Query_Tree(),->
       @.assert_Is_Instance_Of Search_Query_Tree
@@ -34,7 +34,16 @@ describe.only '| services | Search_Query_Tree', ->
           @.results.first().id.assert_Is article_Id
         @.data_Cache.has_Key(cache_Key).assert_Is_True()
 
-  it.only 'map_Queries', ->
+  it 'map_Queries_For_Query', ->
+    query_Id = 'query-4440ee60b313'
+    using new Search_Query_Tree(),->
+      queries = @.map_Queries_For_Query query_Id
+      queries.size().assert_Is 4
+      queries[0].id   .assert_Is 'query-47713f85c9d2'
+      queries[0].title.assert_Is 'Do Not Cache Results of Security Checks'
+      queries[0].size .assert_Is 1
+
+  it 'map_Queries', ->
     using new Search_Query_Tree(),->
       article_Id = "article-fc9facd5e6ff"
       article_Ids = [article_Id, @.search_Data.article_Ids().first()]
@@ -88,4 +97,9 @@ describe.only '| services | Search_Query_Tree', ->
       @.data_Cache.has_Key(key).assert_Is_False()
 
 
-
+  it 'create_Query_Tree_For_Query_Id', (done)->
+    query_Id = 'query-4440ee60b313'
+    using new Search_Query_Tree(),->
+      @.create_Query_Tree_For_Query_Id query_Id, (data)->
+        data.id.assert_Is query_Id
+        done()

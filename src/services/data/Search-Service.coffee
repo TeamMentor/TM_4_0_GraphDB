@@ -9,26 +9,26 @@ class Search_Service
 
   constructor: (options)->
     @.options       = options || {}
-    #@.importService = @.options.importService || new Import_Service(name:'tm-uno')
-    #@.graph         = @.importService.graph
+    @.importService = @.options.importService || new Import_Service(name:'tm-uno')
+    @.graph         = @.importService.graph
     @.search        = new Search()
 
-  article_Titles: (callback)=> callback {}
-#    @.graph.db.nav('Article').archIn('is').as('id')
-#                             .archOut('title').as('title')
-#                             .solutions (err,data) ->
-#                                callback data
+  article_Titles: (callback)=>
+    @.graph.db.nav('Article').archIn('is').as('id')
+                             .archOut('title').as('title')
+                             .solutions (err,data) ->
+                                callback data
   article_Summaries: (callback)=>  callback {}
 #    @.graph.db.nav('Article').archIn('is').as('id')
 #                             .archOut('summary').as('summary')
 #                             .solutions (err,data) ->
 #                                callback data
 
-  query_Titles: (callback)=>  callback {}
-#    @.graph.db.nav('Query').archIn('is').as('id')
-#                             .archOut('title').as('title')
-#                             .solutions (err,data) ->
-#                                callback data
+  query_Titles: (callback)=>
+    @.graph.db.nav('Query').archIn('is').as('id')
+                           .archOut('title').as('title')
+                           .solutions (err,data) ->
+                                callback data
 
   search_Using_Text: (text, callback)=> callback {}
 #    text = text.lower()

@@ -15,9 +15,9 @@ class Search_API extends Swagger_GraphDB
       @.using_Search_Service res, 'search_article_titles.json', (send)->
         @.article_Titles send
 
-    article_summaries: (req,res)=>
-      @.using_Search_Service res, 'search_article_summaries.json', (send)->
-        @.article_Summaries send
+#    article_summaries: (req,res)=>
+#      @.using_Search_Service res, 'search_article_summaries.json', (send)->
+#        @.article_Summaries send
 
     query_titles: (req,res)=>                                               # used by TM_Website.Angular-Controller.get_Search_Auto_Complete
       @.using_Search_Service res, 'search_query_titles.json', (send)->
@@ -50,7 +50,7 @@ class Search_API extends Swagger_GraphDB
     add_Methods: ()=>
 
       @.add_Get_Method 'article_titles'
-      @.add_Get_Method 'article_summaries'
+#      @.add_Get_Method 'article_summaries'
       @.add_Get_Method 'query_titles'
       @.add_Get_Method 'query_from_text_search', ['text',]
       @.add_Get_Method 'word_score', ['word']

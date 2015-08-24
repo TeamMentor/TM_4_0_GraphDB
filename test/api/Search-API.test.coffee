@@ -66,12 +66,12 @@ describe '| api | Search-API.test', ->
       title.title.assert_Is_String()
       done()
 
-  it 'article_summaries', (done)->
-    clientApi.article_summaries (data)->
-      summary = data.obj.assert_Not_Empty().first()
-      summary.id.assert_Contains('article-')
-      summary.summary.assert_Is_String()
-      done()
+#  it 'article_summaries', (done)->
+#    clientApi.article_summaries (data)->
+#      summary = data.obj.assert_Not_Empty().first()
+#      summary.id.assert_Contains('article-')
+#      summary.summary.assert_Is_String()
+#      done()
 
   it 'query_titles', (done)->
     clientApi.query_titles (data)->

@@ -1,82 +1,74 @@
 Search_Service = require '../../../src/services/data/Search-Service'
 Query_Tree     = require '../../../src/services/query-tree/Query-Tree'
 
-describe '| services | data | Search-Service.test |', ->
+describe.only '| services | data | Search-Service.test |', ->
 
   options       = null
   searchService = null
   importService = null
   graph         = null
 
-  #before (done)->
-    #searchService = new Search_Service(options)
-    #importService = searchService.importService
-    #graph         = importService.graph
-    #graph.openDb ->
-    #  done()
-
-  #after (done)->
-    #searchService.graph.closeDb ->
-    #  done()
+#  before (done)->
+#    searchService = new Search_Service(options)
+#    importService = searchService.importService
+#    graph         = importService.graph
+#    graph.openDb ->
+#      done()
+#
+#  after (done)->
+#    searchService.graph.closeDb ->
+#      done()
 
   it 'construtor',->
     using new Search_Service(), ->
       @.options      .assert_Is {}
-      @.importService.assert_Is_Object()
-      @.graph        .assert_Is_Object()
+      @.search     .constructor.name.assert_Is 'Search'
+      @.search_Data.constructor.name.assert_Is 'Search_Data'
+#      @.importService.assert_Is_Object()
+#      @.graph        .assert_Is_Object()
 
   it 'article_Titles', (done)->
-    @.timeout 4000
-    searchService.article_Titles (titles)->
-      titles.assert_Size_Is_Bigger_Than 10
-      article_Id    = titles.first().id
-      article_Title = titles.first().title
-      importService.graph_Find.get_Subjects_Data article_Id, (data)=>
-        data.keys().assert_Size_Is 1
-        using data[article_Id],->
+    using new Search_Service(), ->
+      @.article_Titles (titles)=>
+        titles.assert_Size_Is_Bigger_Than 2200
+        article_Id    = titles.first().id
+        article_Title = titles.first().title
+        using @.search_Data.article(article_Id),->
           @.assert_Is_Object()
           @.title.assert_Is article_Title
           @.id   .assert_Is article_Id
           @.is   .assert_Is 'Article'
-        done()
+          done()
 
-  it 'article_Summaries', (done)->
-    searchService.article_Summaries (titles)->
-      titles.assert_Size_Is_Bigger_Than 10
-      article_Id    = titles.first().id
-      article_Summary = titles.first().summary
-      importService.graph_Find.get_Subjects_Data article_Id, (data)=>
-        data.keys().assert_Size_Is 1
-        using data[article_Id],->
-          @.assert_Is_Object()
-          @.summary.assert_Is article_Summary
-          @.id     .assert_Is article_Id
-          @.is     .assert_Is 'Article'
-        done()
+#  it 'article_Summaries', (done)->
+#    searchService.article_Summaries (titles)->
+#      titles.assert_Size_Is_Bigger_Than 10
+#      article_Id    = titles.first().id
+#      article_Summary = titles.first().summary
+#      importService.graph_Find.get_Subjects_Data article_Id, (data)=>
+#        data.keys().assert_Size_Is 1
+#        using data[article_Id],->
+#          @.assert_Is_Object()
+#          @.summary.assert_Is article_Summary
+#          @.id     .assert_Is article_Id
+#          @.is     .assert_Is 'Article'
+#        done()
 
   it 'query_Titles', (done)->
-    searchService.query_Titles (titles)->
-      titles.assert_Size_Is_Bigger_Than 10
-      query_Id    = titles.first().id
-      query_Title = titles.first().title
-      importService.graph_Find.get_Subjects_Data query_Id, (data)=>
-        data.keys().assert_Size_Is 1
-        using data[query_Id],->
+    using new Search_Service(), ->
+      @.query_Titles (titles)=>
+        titles.assert_Size_Is_Bigger_Than 10
+        query_Id    = titles.first().id
+        query_Title = titles.first().title
+        using @.search_Data.query_Mappings()[query_Id],->
           @.assert_Is_Object()
           @.title.assert_Is query_Title
           @.id   .assert_Is query_Id
           @.is   .assert_Is 'Query'
-        done()
-
-  it 'search_Using_Text', (done)->
-    @.timeout 5000
-    text = 'java'
-    searchService.search_Using_Text text, (results)->
-      results.assert_Not_Empty()
-      done()
+          done()
 
   it 'query_Key_From_Text', ()->
-    using searchService.query_Id_From_Text,->
+    using new Search_Service().query_Id_From_Text,->
       @('xss'  ).assert_Is('search-xss'  )
       @('XSS'  ).assert_Is('search-xss'  )
       @(' XSS' ).assert_Is('search-xss'  )

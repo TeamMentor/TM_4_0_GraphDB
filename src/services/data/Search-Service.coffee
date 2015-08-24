@@ -1,39 +1,49 @@
-Import_Service        = require './Import-Service'
+#Import_Service        = require './Import-Service'
 #Search_Text_Service   = require '../text-search/Search-Text-Service'
 #Search_Build          = require './Search-Build'
 Search                = require '../search/Search'
+Search_Data           = require '../search/Search-Data'
 
-Guid                  = require('teammentor').Guid
+#Guid                  = require('teammentor').Guid
 
 class Search_Service
 
   constructor: (options)->
     @.options       = options || {}
-    @.importService = @.options.importService || new Import_Service(name:'tm-uno')
-    @.graph         = @.importService.graph
+    #@.importService = @.options.importService || new Import_Service(name:'tm-uno')
+    #@.graph         = @.importService.graph
     @.search        = new Search()
+    @.search_Data   = new Search_Data()
 
   article_Titles: (callback)=>
-    @.graph.db.nav('Article').archIn('is').as('id')
-                             .archOut('title').as('title')
-                             .solutions (err,data) ->
-                                callback data
-  article_Summaries: (callback)=>  callback {}
+    article_Titles = []
+    for article_Id, article of @.search_Data.articles()
+      article_Titles.push id : article.id, title: article.title
+
+    callback article_Titles
+
+    #@.graph.db.nav('Article').archIn('is').as('id')
+    #                         .archOut('title').as('title')
+    #                         .solutions (err,data) ->
+    #                            callback data
+
+#  article_Summaries: (callback)=>  callback {}
 #    @.graph.db.nav('Article').archIn('is').as('id')
 #                             .archOut('summary').as('summary')
 #                             .solutions (err,data) ->
 #                                callback data
 
   query_Titles: (callback)=>
-    @.graph.db.nav('Query').archIn('is').as('id')
-                           .archOut('title').as('title')
-                           .solutions (err,data) ->
-                                callback data
+    query_Titles = []
+    for title ,query_Id  of @.search_Data.query_Titles()
+      query_Titles.push id : query_Id, title: title
 
-  search_Using_Text: (text, callback)=> callback {}
-#    text = text.lower()
-#    new Search_Text_Service(importService:@.importService).words_Score text, (results)->
-#      callback results
+    callback query_Titles
+    #@.graph.db.nav('Query').archIn('is').as('id')
+    #                       .archOut('title').as('title')
+    #                       .solutions (err,data) ->
+    #                            callback data
+
 
   query_Id_From_Text: (text)=>
     "search-#{text.trim().to_Safe_String()}"

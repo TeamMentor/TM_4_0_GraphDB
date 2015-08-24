@@ -2,49 +2,44 @@ Cache_Service            = null
 async                    = null
 loaded_Search_Mappings   = null
 loaded_Tag_Mappings      = null
+Search_Data              = null
 
 class Search_Text
 
   dependencies: ->
-    Cache_Service            = require('teammentor').Cache_Service
-    async                    = require 'async'
+    {Cache_Service}       = require 'teammentor'
+    async                 = require 'async'
+    Search_Data           = require '../search/Search-Data'
+
 
   constructor: (options)->
     @.dependencies()
     @.options             = options || {}
     @.cache_Search        = new Cache_Service("search_cache")
-    @.folder_Lib_UNO_Json = global.config?.tm_graph?.folder_Lib_UNO_Json
-
-  folder_Search_Data: ()=>
-    @.folder_Lib_UNO_Json?.path_Combine 'Search_Data'
-
+    @.search_Data         = new Search_Data()
 
   search_Mappings: (callback)=>
+    if loaded_Search_Mappings is null
+      loaded_Search_Mappings = @.search_Data.search_Text_Data()
+    callback loaded_Search_Mappings
 
-    if loaded_Search_Mappings
-      return callback loaded_Search_Mappings
-
-    key = @.folder_Search_Data()?.path_Combine 'search_mappings.json'
-
-    if key?.file_Exists()
-      loaded_Search_Mappings = key.load_Json()
-      return callback loaded_Search_Mappings
-    callback {}
 
   tag_Mappings: (callback)=>
-    callback {}
+    if loaded_Tag_Mappings is null
+      loaded_Tag_Mappings = @.search_Data.tag_Mappings()
+    callback loaded_Tag_Mappings
 
   word_Data: (word, callback)=>
     @.search_Mappings (mappings)->
       callback mappings[word] || null
 
-  normalize_Article_Id: (article_Id)=>
-    if article_Id.starts_With('article-')
-      return article_Id
-    splited = article_Id.split('-')
-    if splited.size() is 5
-      return "article-#{splited.last()}"
-    return article_Id
+#  normalize_Article_Id: (article_Id)=>
+#    if article_Id.starts_With('article-')
+#      return article_Id
+#    splited = article_Id.split('-')
+#    if splited.size() is 5
+#      return "article-#{splited.last()}"
+#    return article_Id
 
   word_Score: (word, callback)=>
     word = word.lower()
@@ -54,29 +49,30 @@ class Search_Text
       @.search_Mappings (mappings)=>
         add_Results_Mappings =  (key)=>
           for article_Id, data of mappings[key]
-              result = {id : @.normalize_Article_Id(article_Id), score: 0, why: {}}
-              for tag in data.where
-                score = 1
-                switch tag
-                  when 'title'
-                    score = 30
-                  when 'h1'
-                    score = 5
-                  when 'h2'
-                    score = 4
-                  when 'em'
-                    score = 3
-                  when 'b'
-                    score = 3
-                  when 'a'
-                    score = -4
-                  when 'span'
-                    score = 0
+            result = {id : article_Id, score: 0, why: {}}
 
-                result.score += score
-                result.why[tag]?=0
-                result.why[tag]+=score
-              results.push result
+            for tag,occurences of data
+              score = 1
+              switch tag
+                when 'title'
+                  score = 30
+                when 'h1'
+                  score = 5
+                when 'h2'
+                  score = 4
+                when 'em'
+                  score = 3
+                when 'b'
+                  score = 3
+                when 'a'
+                  score = -4
+                when 'span'
+                  score = 0
+
+              result.score += score * occurences
+              result.why[tag]?=0
+              result.why[tag]+=score
+            results.push result
 
         add_Tag_Mappings = (key)=>
           if tag_Mappings[key]

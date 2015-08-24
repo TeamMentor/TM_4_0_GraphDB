@@ -21,6 +21,15 @@ class Query_Tree
       if @.data_Cache.has_Key cache_Key
         callback @.data_Cache.get(cache_Key)?.json_Parse()
       else
-        @.create_Query_Tree_For_Query_Id query_Id, callback
+        @.create_Query_Tree_For_Query_Id query_Id, (query_Tree)=>
+          if filters
+            @.apply_Query_Tree_Query_Id_Filter query_Tree, filters, (filtered_Query_Tree)->
+              callback filtered_Query_Tree
+          else
+            callback query_Tree
+
+
+
+
 
 module.exports = Query_Tree

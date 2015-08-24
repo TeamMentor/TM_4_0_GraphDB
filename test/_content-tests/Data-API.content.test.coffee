@@ -63,8 +63,8 @@ describe '| api | Data-API.content', ->
         done()
 
 
-  it.only 'Open Index queries - via query_tree', (done)->
-    @.timeout 10000         # takes 7 secs when calculations are needed and 1.8s secs when cache files exist
+  it 'Open Index queries - via query_tree', (done)->
+    @.timeout 3000         # takes ~2.636 secs when calculations are needed and 1.8s secs when cache files exist
     last_Query_Tree = null
     open_Query = (id, next)->
       clientApi.query_view_model { id:id, from:0, to:2 }, (data)->
@@ -74,8 +74,6 @@ describe '| api | Data-API.content', ->
           next()
     open_Query 'query-6234f2d47eb7', (data)->
       query_Ids = (query.id for query in last_Query_Tree.queries)
-      console.log 'making ' + query_Ids.size()
-      console.log 'making ' + query_Ids.unique().size() + ' requests'
       async.each query_Ids, open_Query, ->
         done()
 

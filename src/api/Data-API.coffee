@@ -2,6 +2,7 @@ GraphDB_API          = require '../../src/api/GraphDB-API'
 Swagger_GraphDB      = require './base-classes/Swagger-GraphDB'
 Article              = require '../graph/Article'
 Query_View_Model     = require '../../src/services/data/Query-View-Model'
+Search_Data          = require '../../src/services/search/Search-Data'
 Search_Query_Tree    = require '../../src/services/search/Search-Query-Tree'
 Query_Tree           = require '../../src/services/query-tree/Query-Tree'
 
@@ -23,10 +24,7 @@ class Data_API extends Swagger_GraphDB
           send ''
 
   articles: (req,res)=>
-    cache_Key = 'articles.json'
-    @.using_Graph_Find res, cache_Key, (send)->
-      @.find_Using_Is 'Article', (articles_Ids)=>
-        @.get_Subjects_Data articles_Ids, send
+    res.json new Search_Data().articles()
 
   article_Html: (req,res)=>
     id        = req.params.id

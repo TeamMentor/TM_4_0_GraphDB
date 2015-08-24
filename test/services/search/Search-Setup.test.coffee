@@ -19,8 +19,8 @@ describe 'Search-Setup', ->
       @.cache             .cacheFolder().assert_Folder_Exists()
       @.cache.area        .assert_Is 'search_cache'
 
-  it 'build_All', (done)->
-    @.timeout 5000
+  it 'build_All', (done)->                        # takes 13,706 ms to build, 1,350 ms from cache
+    @.timeout 20000
     using new Search_Setup(),->
       #@.clear_All()
       @.build_All =>
@@ -29,6 +29,7 @@ describe 'Search-Setup', ->
         @.cache.has_Key(@.key_Query_Mappings      ).assert_Is_True()
         @.cache.has_Key(@.key_Query_Titles        ).assert_Is_True()
         @.cache.has_Key(@.key_Article_Root_Queries).assert_Is_True()
+        @.cache.has_Key(@.key_Search_Text_Data    ).assert_Is_True()
         @.cache.has_Key(@.key_Tags_Mappings       ).assert_Is_True()
         done()
 
@@ -75,10 +76,18 @@ describe 'Search-Setup', ->
       @.create_Query_Titles (data)=>
         data.keys().first().assert_Not_Contains 'query-'
         data[data.keys().first()].assert_Contains 'query-'
-
         data.keys().assert_Size_Is_Bigger_Than 250
         @.cache.has_Key(@.key_Query_Mappings).assert_Is_True()
         done()
+
+  it 'create_Search_Text_Data', (done)->
+    using new Search_Setup(),->
+      @.create_Search_Text_Data (data)=>
+        words = (word for word of data)
+        words.assert_Size_Is_Bigger_Than 11000     # 11083
+        @.cache.has_Key(@.key_Search_Text_Data).assert_Is_True()
+        done()
+
 
   it 'create_Tag_Mappings', (done)->
     using new Search_Setup(),->

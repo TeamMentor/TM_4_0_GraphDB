@@ -1,4 +1,5 @@
 Search_Service = require '../../../src/services/data/Search-Service'
+Query_Tree     = require '../../../src/services/query-tree/Query-Tree'
 
 describe '| services | data | Search-Service.test |', ->
 
@@ -7,16 +8,16 @@ describe '| services | data | Search-Service.test |', ->
   importService = null
   graph         = null
 
-  before (done)->
-    searchService = new Search_Service(options)
-    importService = searchService.importService
-    graph         = importService.graph
-    graph.openDb ->
-      done()
+  #before (done)->
+    #searchService = new Search_Service(options)
+    #importService = searchService.importService
+    #graph         = importService.graph
+    #graph.openDb ->
+    #  done()
 
-  after (done)->
-    searchService.graph.closeDb ->
-      done()
+  #after (done)->
+    #searchService.graph.closeDb ->
+    #  done()
 
   it 'construtor',->
     using new Search_Service(), ->
@@ -67,12 +68,9 @@ describe '| services | data | Search-Service.test |', ->
           @.is   .assert_Is 'Query'
         done()
 
-  # see https://github.com/TeamMentor/TM_4_0_Design/issues/521
-  # doesn't work until the search data is parsed and loaded. This should be fixed in an improved version of the search cache
-
   it 'search_Using_Text', (done)->
     @.timeout 5000
-    text = 'security'
+    text = 'java'
     searchService.search_Using_Text text, (results)->
       results.assert_Not_Empty()
       done()
@@ -86,26 +84,32 @@ describe '| services | data | Search-Service.test |', ->
       @('X-s-s').assert_Is('search-x-s-s')
       @('X$s*s').assert_Is('search-x-s-s')
 
-  # see https://github.com/TeamMentor/TM_4_0_Design/issues/521
-  # doesn't work until the search data is parsed and loaded. This should be fixed in an improved version of the search cache
-  it 'query_From_Text_Search', (done)->
-    text = 'Security'
-    searchService.query_From_Text_Search text, (query_Id)->
-      query_Id.assert_Is 'search-security'
-      importService.graph_Find.get_Subject_Data query_Id, (data)->
-        data.title.lower().assert_Is text.lower()
-        done();
+  it 'query_From_Text_Search (html5)', (done)->
+    text = 'html5'
+    using new Search_Service(options), ->
+      @.query_From_Text_Search text, (query_Id)=>
+        query_Id.assert_Is 'search-html5'
+        new Query_Tree().get_Query_Tree query_Id, (data)->
+          using data, ->
+            @.id        .assert_Is query_Id
+            @.title     .assert_Is 'html5'
+            @.size      .assert_Is 81
+            @.containers.assert_Size_Is 5
+            @.results   .assert_Size_Is 81
+            @.filters.assert_Size_Is 3  # this is a  bug
+            done()
 
-  xit 'Check that parent queries are mapped', (done)->
-    @.timeout 10000
-    #query = 'search-jsp-debug'
-    text = 'jsp debug'
-    searchService.query_From_Text_Search text, (query_Id)->
-      #searchService.map_Search_Parent_Queries query_Id, (data)->
-      #  searchService.create_Search_Parent_Queries_Nodes query_Id, data, (result)->
-      #    console.log result
-          done()
-  xit 'Check that query tree for 53bb1a85ee3a', (done)->
-    searchService.get_Query_Tree 'query-53bb1a85ee3a', (data)->
-      console.log data
-      done()
+  it 'query_From_Text_Search (xss)', (done)->
+    text = 'xss'
+    using new Search_Service(options), ->
+      @.query_From_Text_Search text, (query_Id)=>
+        query_Id.assert_Is 'search-xss'
+        new Query_Tree().get_Query_Tree query_Id, (data)->
+          using data, ->
+            @.id        .assert_Is query_Id
+            @.title     .assert_Is 'xss'
+            @.size      .assert_Is 77
+            @.containers.assert_Size_Is 9
+            @.results   .assert_Size_Is 77
+            @.filters.assert_Size_Is 3
+            done()

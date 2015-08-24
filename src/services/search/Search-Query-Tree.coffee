@@ -52,7 +52,7 @@ class Search_Query_Tree
     if query_Mapping
       for query in query_Mapping.queries
         queries.push { id : query.id , title: query.title, size: query.articles.size(), articles:query.articles }
-    return queries
+    return @.sort_Queries queries
 
 
   map_Queries: (article_Ids)=>
@@ -131,5 +131,80 @@ class Search_Query_Tree
 
     @.data_Cache.put key, query_Tree
     return query_Tree
+
+  sort_Filter: (filter)->
+    titles = (result.title.lower() for result in filter.results).sort()
+    sorted_Results = []
+    for title in titles
+      for result in filter.results
+        if result.title.lower() is title
+          sorted_Results.push result
+          continue
+    filter.results  = sorted_Results
+    filter
+
+  sort_Queries: (queries)->
+    titles = (query.title.lower() for query in queries).sort()
+
+    sorted_Queries = []
+    for title in titles
+      for query in queries
+        if query.title.lower() is title
+          sorted_Queries.push query
+          continue
+    sorted_Queries
+
+
+  apply_Query_Tree_Query_Id_Filter: (query_Tree, query_Ids, callback)=>
+    articles = []
+    if query_Ids
+      for query_Id in query_Ids.split(',')
+
+        filter_Query     = @.query_Mappings[query_Id]
+        if filter_Query
+          if articles.empty()
+            articles = filter_Query.articles
+          else
+            articles = (article for article in articles when article in filter_Query.articles)
+
+
+    if articles.empty()
+      return callback {}
+
+    @.apply_Query_Tree_Articles_Filter query_Tree, articles, callback
+
+  apply_Query_Tree_Articles_Filter: (query_Tree, articles, callback)=>
+
+    if not query_Tree
+      return callback {}
+
+    filtered_Tree =
+      id         : query_Tree.id
+      containers : query_Tree.containers
+      results    : []
+      filters    : query_Tree.filters
+
+    if query_Tree.results
+      for result in query_Tree.results
+        if articles.contains(result.id)
+          filtered_Tree.results.add result
+
+    if query_Tree.containers
+      for container in query_Tree.containers
+        container.size = 0
+        for result in filtered_Tree.results
+          if container.articles.contains(result.id)
+            container.size++
+
+    if query_Tree.filters
+      for filter in query_Tree.filters
+        for filter_Result in filter.results
+          filter_Result.size = 0
+          for result in filtered_Tree.results
+            if filter_Result.articles.contains(result.id)
+              filter_Result.size++
+
+    filtered_Tree.title = query_Tree.title
+    callback filtered_Tree
 
 module.exports = Search_Query_Tree

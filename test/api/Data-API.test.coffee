@@ -47,8 +47,8 @@ describe '| api | Data-API.test', ->
           done()
 
     it 'article', (done)->
-      clientApi.articles (article_Ids)->
-        article_Id = article_Ids.obj.keys().first()
+      clientApi.articles (articles)->
+        article_Id = articles.obj.keys().first()
         article_Id.assert_Contains 'article-'
         clientApi.article {ref: article_Id}, (data)->
           data.obj.article_Id.assert_Is article_Id
@@ -218,7 +218,6 @@ describe '| api | Data-API.test', ->
       to      = 10
       clientApi.query_view_model id: query_Id, from: from, to: to, (data)->
         using data.obj, ->
-          @._id      .assert_Is query_Id
           @._filters .assert_Is ''
           @._from    .assert_Is from
           @._to      .assert_Is to
@@ -234,7 +233,6 @@ describe '| api | Data-API.test', ->
       to      = 10
       clientApi.query_view_model_filtered id: query_Id, filters: filters, from: from, to: to, (data)->
         using data.obj, ->
-          @._id      .assert_Is query_Id
           @._filters .assert_Is filters
           @._from    .assert_Is from
           @._to      .assert_Is to

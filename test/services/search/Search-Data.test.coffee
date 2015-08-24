@@ -61,6 +61,12 @@ describe 'Search-Data', ->
         @.keys().first()  .assert_Not_Contains 'query-'
         @.values().first().assert_Contains 'query-'
 
+  it 'search_Text_Data', ->
+    using new Search_Data(),->
+      using @.search_Text_Data(),->
+        words = (word for word of @)
+        words.assert_Size_Is_Bigger_Than 11000     # 11083
+
 
   it 'tag_Mappings', ->
     using new Search_Data(),->

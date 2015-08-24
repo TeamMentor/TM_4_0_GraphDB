@@ -1,36 +1,30 @@
-#todo refactor and remove global.config dependency
-require 'fluentnode'
-root_Folder = process.cwd().path_Combine '../../'
-if not global.config
-  global.config =
-    tm_graph:
-      folder_Lib_UNO_Json     : root_Folder.path_Combine 'data/Lib_UNO-Json'
-
-
-
-Search_Text_Service = require './../../../src/services/search/Search-Text'
-
+Search_Text = require './../../../src/services/search/Search-Text'
 
 describe '| services | text-search | Search-Text..', ->
 
   search_Text = null
 
   before (done)->
-    search_Text = new Search_Text_Service()
+    search_Text = new Search_Text()
     done()
 
-  it 'folder_Search_Data', ()->
-    search_Text.folder_Search_Data().assert_Folder_Exists()
+  it 'constructor', ->
+    using new Search_Text(),->
+      @.options.assert_Is {}
+      @.cache_Search.constructor.name.assert_Is 'CacheService'
+      @.search_Data .constructor.name.assert_Is 'Search_Data'
 
   it 'search_Mappings', (done)->
-    @timeout 10000
     search_Text.search_Mappings (data)->
-      data.assert_Is_Object()
+      data.assert_Is_Not {}
+      words = (word for word of data)
+      words.assert_Size_Is_Bigger_Than 11000
       done()
 
   it 'tag_Mappings', (done)->
     search_Text.tag_Mappings (data)->
       data.assert_Is_Object()
+      data.keys().assert_Size_Is 21
       done()
 
   it 'word_Data', (done)->
@@ -38,8 +32,8 @@ describe '| services | text-search | Search-Text..', ->
       results.keys().assert_Not_Empty()
       done()
 
+
   it 'word_Score', (done)->
-    @.timeout 5000
     search_Text.word_Score 'injection', (results)->
     #search_Text.word_Score 'wcf 3.5', (results)->
       results.assert_Not_Empty()
@@ -50,10 +44,13 @@ describe '| services | text-search | Search-Text..', ->
       done()
 
   it 'words_Score', (done)->
-    search_Text.words_Score 'sQL   injection', (results)->
-    #search_Text.words_Score 'wcf 3.5', (results)->
-      results.assert_Not_Empty()
-      done()
+    search_Text.words_Score 'sQL   injECTion', (results_1)->
+      search_Text.words_Score 'SQL Injection', (results_2)->
+        search_Text.words_Score 'sql injection', (results_3)->
+          results_1.assert_Not_Empty()
+          results_1.assert_Is results_2
+          results_1.assert_Is results_3
+          done()
 
   it 'words_List ', (done)->
     search_Text.words_List (words)->

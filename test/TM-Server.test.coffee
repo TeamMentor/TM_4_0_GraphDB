@@ -14,7 +14,7 @@ describe '| test-Server |',->
     port = 10000 + 10000.random()
     server = new TM_Server({ port : port} ).configure()
 
-  it.only 'check ctor', ->
+  it 'check ctor', ->
     using new TM_Server(),->
       @.options.assert_Is {}
       @.app.constructor.name.assert_Is 'EventEmitter'
@@ -31,7 +31,7 @@ describe '| test-Server |',->
       @.url             .assert_Is_Function()
       @.routes          .assert_Is_Function()
 
-  it.only 'search_Setup', (done)=>
+  it 'search_Setup', (done)=>
     using new TM_Server(),->
       @.search_Setup.cache.delete @.search_Setup.key_Article_Root_Queries
       @.search_Setup.cache.has_Key(@.search_Setup.key_Article_Root_Queries).assert_Is_False()

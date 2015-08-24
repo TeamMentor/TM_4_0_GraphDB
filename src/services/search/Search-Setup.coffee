@@ -1,25 +1,28 @@
 # this class will build all the required search artifacts and put them in the search_cache
 
-{Cache_Service}     = require('teammentor')
-Graph_Service       = require '../graph/Graph-Service'
-Graph_Find          = require '../graph/Graph-Find'
-Query_Mappings      = require '../data/Query-Mappings'
-Search_Data_Parsing = require './Search-Data-Parsing'
+{Cache_Service}      = require('teammentor')
+Graph_Service        = require '../graph/Graph-Service'
+Graph_Find           = require '../graph/Graph-Find'
+Query_Mappings       = require '../data/Query-Mappings'
+Search_Data_Parsing  = require './Search-Data-Parsing'
+Search_Text_Mappings = require './Search-Text-Mappings'
 
 class Search_Setup
   constructor: (options)->
-    @.options             = options || {}
-    @.cache               = @.options.cache || new Cache_Service("search_cache")
-    @.graph               = new Graph_Service name: 'tm-uno'
-    @.graph_Find          = new Graph_Find(@.graph)
-    @.search_Data_Parsing = new Search_Data_Parsing()
-    @.query_Mappings      = new Query_Mappings( graph_Find : @.graph_Find )
+    @.options              = options || {}
+    @.cache                = @.options.cache || new Cache_Service("search_cache")
+    @.graph                = new Graph_Service name: 'tm-uno'
+    @.graph_Find           = new Graph_Find(@.graph)
+    @.search_Data_Parsing  = new Search_Data_Parsing()
+    @.query_Mappings       = new Query_Mappings( graph_Find : @.graph_Find )
+    @.search_Text_Mappings = new Search_Text_Mappings()
 
     @.key_Articles              = 'articles.json'
     @.key_Article_Ids           = 'article_Ids.json'
     @.key_Article_Root_Queries  = 'article_Root_Queries.json'
     @.key_Query_Mappings        = 'query_mappings.json'
     @.key_Query_Titles          = 'query_titles.json'
+    @.key_Search_Text_Data      = 'search_text_data.json'
     @.key_Tags_Mappings         = 'tags_mappings.json'
 
   # takes about 3 secs if not of the files exists, and 50ms if they exist
@@ -30,7 +33,8 @@ class Search_Setup
           @.create_Query_Titles =>
             @.create_Article_Root_Queries =>
               @.create_Tag_Mappings =>
-                callback()
+                @.create_Search_Text_Data =>
+                  callback()
 
   clear_All: ()=>
     @.cache.delete @.key_Articles
@@ -38,6 +42,7 @@ class Search_Setup
     @.cache.delete @.key_Article_Root_Queries
     @.cache.delete @.key_Query_Mappings
     @.cache.delete @.key_Query_Titles
+    @.cache.delete @.key_Search_Text_Data
     @.cache.delete @.key_Tags_Mappings
 
   create_Articles            : (callback)=> @.get_Or_Create_Mapping @.key_Articles             , @.graph_Find.get_Articles_Data                , callback
@@ -45,6 +50,7 @@ class Search_Setup
   create_Article_Root_Queries: (callback)=> @.get_Or_Create_Mapping @.key_Article_Root_Queries , @.search_Data_Parsing.map_Article_Root_Queries, callback
   create_Query_Mappings      : (callback)=> @.get_Or_Create_Mapping @.key_Query_Mappings       , @.query_Mappings.get_Queries_Mappings         , callback
   create_Query_Titles        : (callback)=> @.get_Or_Create_Mapping @.key_Query_Titles         , @.query_Mappings.get_Query_Titles             , callback
+  create_Search_Text_Data    : (callback)=> @.get_Or_Create_Mapping @.key_Search_Text_Data     , @.search_Text_Mappings.get_Search_Text_Data   , callback
   create_Tag_Mappings        : (callback)=> @.get_Or_Create_Mapping @.key_Tags_Mappings        , @.graph_Find.find_Tags                        , callback
 
   get_Or_Create_Mapping: (key, action, callback)=>

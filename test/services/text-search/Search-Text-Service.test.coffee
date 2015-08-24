@@ -1,3 +1,5 @@
+return
+
 Search_Text_Service = require './../../../src/services/text-search/Search-Text-Service'
 
 describe '| services | text-search | Search-Text-Service', ->

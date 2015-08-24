@@ -1,6 +1,6 @@
 #require 'fluentnode'
 Swagger_GraphDB       = require './base-classes/Swagger-GraphDB'
-Search_Text_Service   = require '../services/text-search/Search-Text-Service'
+#Search_Text_Service   = require '../services/text-search/Search-Text-Service'
 Search                = require '../services/search/Search'
 
 

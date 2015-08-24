@@ -1,6 +1,6 @@
 Query_Tree = require './../../src/services/query-tree/Query-Tree'
 
-describe.only '| _content-tests | Query-Tree.content', ->
+describe '| _content-tests | Query-Tree.content', ->
 
   it 'query_Tree (index)',   ()->
     using new Query_Tree(),->
@@ -50,6 +50,22 @@ describe.only '| _content-tests | Query-Tree.content', ->
             @[0].assert_Is title: 'Technology', "results":[{"id":"query-8c511380a4f5","title":".NET","size":1,"articles":["article-3b1c76cc63ca"]},{"id":"query-671d16362ce4","title":"C++","size":8,"articles":["article-2be0a8a337cf","article-f3cb4117f676","article-bb4d49c5d472","article-c10b60e5c6a9","article-22493ddbbe9e","article-293c9784332d","article-9703ecf83706","article-b99c29a20f7b"]} ]
             @[1].assert_Is title :"Phase","results":[{"id":"query-66ed61faad6b","title":"Implementation","size":9,"articles":["article-3b1c76cc63ca","article-2be0a8a337cf","article-f3cb4117f676","article-bb4d49c5d472","article-c10b60e5c6a9","article-22493ddbbe9e","article-293c9784332d","article-9703ecf83706","article-b99c29a20f7b"]}]
             @[2].assert_Is title: "Type","results":[{"id":"query-766d8a5e743e","title":"Checklist Item","size":5,"articles":["article-3b1c76cc63ca","article-2be0a8a337cf","article-bb4d49c5d472","article-9703ecf83706","article-b99c29a20f7b"]},{"id":"query-454a626d5266","title":"Guideline","size":4,"articles":["article-f3cb4117f676","article-c10b60e5c6a9","article-22493ddbbe9e","article-293c9784332d"]}]
+
+
+
+  it.only 'query-tree (query-4440ee60b313), check results are in alphabetical order',->
+    query_Id = 'query-4440ee60b313'
+    using new Query_Tree(),->
+      @.get_Query_Tree query_Id, (query_Tree)->
+        console.log query_Tree.containers.size().assert_Is 4
+        titles = (container.title for container in query_Tree.containers)
+        console.log titles
+        titles.assert_Is [ 'Create Temporary Files Carefully',
+                           'Do Not Cache Results of Security Checks',
+                           'Use Locks with Mutexes',
+                           'Use Semaphores Correctly' ]
+        titles[1].assert_Is 'Do Not Cache Results of Security Checks'
+        titles[2].assert_Is 'Use Locks with Mutexes'
 
 
   it 'Open all Index queries ',   ()->                                      # takes 183ms to create, 84ms from cache

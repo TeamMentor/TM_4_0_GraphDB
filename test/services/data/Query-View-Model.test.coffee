@@ -37,7 +37,7 @@ describe '| services | data | Query-View-Model', ->
       @.get_Filters query_Id, filters, (filters)->
         filters['Technology'].first().assert_Is id: 'query-8c511380a4f5', title: '.NET'           , size: 14
         filters['Type'      ].first().assert_Is id: 'query-766d8a5e743e', title: 'Checklist Item' , size: 21
-        filters['Phase'     ].first().assert_Is id: 'query-28b25f1c32d5', title: 'Deployment'     , size: 5
+        filters['Phase'     ][2].assert_Is id: 'query-28b25f1c32d5', title: 'Deployment'     , size: 5
         done()
 
   it 'get_Filters (with filters)', (done)->
@@ -47,7 +47,7 @@ describe '| services | data | Query-View-Model', ->
       @.get_Filters query_Id, filters, (filters)->
         filters['Technology'].first().assert_Is id: 'query-8c511380a4f5', title: '.NET'           , size: 14
         filters['Type'      ].first().assert_Is id: 'query-766d8a5e743e', title: 'Checklist Item' , size: 5
-        filters['Phase'     ].first().assert_Is id: 'query-7ff5431f1878', title: 'Design'         , size: 1
+        filters['Phase'     ].second().assert_Is id: 'query-7ff5431f1878', title: 'Design'         , size: 1
         done()
 
   it 'get_Queries', (done)->
@@ -91,54 +91,6 @@ describe '| services | data | Query-View-Model', ->
       @.get_View_Model 'aaaa1234', null, null, null, (view_Model)->
         view_Model.assert_Is cache_Key: 'query_tree_aaaa1234.json'
         done()
-
-
-
-
-  #regression tests for specific queries
-
-  it 'get_View_Model (query-9cbfa10fee54, query-b439376de44c)', ()->
-    using new Query_View_Model(), ->
-      @.get_View_Model 'query-9cbfa10fee54', '', 0, 2, (view_Model)->
-        using view_Model, ->
-          @.id   .assert_Is 'query-9cbfa10fee54'
-          @.title.assert_Is 'Use Role-based Authorization'
-
-      @.get_View_Model 'query-b439376de44c', '', 0, 2, (view_Model)->
-        using view_Model, ->
-          @.id   .assert_Is 'query-b439376de44c'
-          @.title.assert_Is 'Allow Managing Access Controls'
-
-
-
-
-
-  it 'get_View_Model (query-4440ee60b313)', (done)->
-    # check values so that refactoring of query_view_model calculation has no side effects
-    query_Id = 'query-4440ee60b313'  # 'Authorization' query
-    using new Query_View_Model(), ->
-      @.get_View_Model query_Id, '', 0, 2, (view_Model)->
-        using view_Model,->
-          @._filters.assert_Is ''
-          @._from   .assert_Is 0
-          @_to      .assert_Is 2
-          @.id      .assert_Is 'query-4440ee60b313'
-          @.title   .assert_Is 'Concurrency'
-          @.size    .assert_Is 9
-          @.queries .assert_Size_Is 4
-          @.queries[3].assert_Is  "id": "query-9580060e39dc", "title": "Create Temporary Files Carefully"       , "size": 4
-          @.queries[0].assert_Is  "id": "query-47713f85c9d2", "title": "Do Not Cache Results of Security Checks", "size": 1
-          @.queries[1].assert_Is  "id": "query-54bb2015d62e", "title": "Use Locks with Mutexes"                 , "size": 2
-          @.queries[2].assert_Is  "id": "query-68ca84b61578", "title": "Use Semaphores Correctly"               , "size": 2
-          @.articles .assert_Size_Is 2
-          @.articles[0].assert_Is "tags": ".NET", "technology": ".NET", "is": "Article", "summary": "Check to ensure that multithreaded code does not cache the results of security checks as it is vulnerable.\r\n  If your multithreaded code caches the results of a security check, perhaps in a static var", "type": "Checklist Item", "phase": "Implementation", "title": "Multithreaded Code Does Not Cache the Results of Security Checks", "guid": "dadddf42-9855-46a8-983d-3b1c76cc63ca", "id": "article-3b1c76cc63ca"
-          @.articles[1].assert_Is "is": "Article","tags": "C++", "technology": "C++", "type": "Checklist Item", "phase": "Implementation", "title": "Locks Are Used with Mutexes to Avoid Deadlocks", "summary": "Verify that locks are used with mutexes, instead of manual locking and unlocking.Using std::lock_guard makes it simpler to prevent deadlocks, because it unlocks mutexes automaticaly when a function ex", "guid": "e75f4a58-8ee4-4fda-8ed0-2be0a8a337cf", "id": "article-2be0a8a337cf"
-          @.filters.keys().assert_Size_Is 3
-          @.filters.Technology.assert_Is [ { "id": "query-8c511380a4f5", "title": ".NET", "size": 1 }, { "id": "query-671d16362ce4", "title": "C++", "size": 8 }]
-          @.filters.Phase     .assert_Is [ { "id": "query-66ed61faad6b", "title": "Implementation", "size": 9 } ]
-          @.filters.Type      .assert_Is [ { "id": "query-766d8a5e743e", "title": "Checklist Item", "size": 5 }, { "id": "query-454a626d5266", "title": "Guideline", "size": 4 } ]
-          done()
-
 
   it 'query_Tree_Filtered', (done)->
     query_Id = 'query-2416c5861783'  # 'Authorization' query

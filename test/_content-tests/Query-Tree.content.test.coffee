@@ -1,4 +1,5 @@
 Query_Tree = require './../../src/services/query-tree/Query-Tree'
+Search     = require './../../src/services/search/Search'
 
 describe '| _content-tests | Query-Tree.content', ->
 
@@ -53,7 +54,7 @@ describe '| _content-tests | Query-Tree.content', ->
 
 
 
-  it.only 'query-tree (query-4440ee60b313), check results are in alphabetical order',->
+  it 'query-tree (query-4440ee60b313), check results are in alphabetical order',->
     query_Id = 'query-4440ee60b313'
     using new Query_Tree(),->
       @.get_Query_Tree query_Id, (query_Tree)->
@@ -66,6 +67,34 @@ describe '| _content-tests | Query-Tree.content', ->
                            'Use Semaphores Correctly' ]
         titles[1].assert_Is 'Do Not Cache Results of Security Checks'
         titles[2].assert_Is 'Use Locks with Mutexes'
+
+  it.only 'query_tree_filtered (search-owasp , query-7d9a1b64c045)', (done)->
+    search_Text = 'owasp'
+    query_Id    = 'search-owasp'
+    filters     = 'query-7d9a1b64c045'
+
+    using new Query_Tree(), ->
+      @.get_Query_Tree_Filtered query_Id, filters,(query_Tree)=>
+        query_Tree.id.assert_Is query_Id
+        query_Tree.results.assert_Size_Is 29
+        query_Tree.containers.assert_Size_Is 15
+        query_Tree.filters.assert_Size_Is 3
+        done()
+
+  it.only 'query_tree_filtered (search-owasp___query-d43fe5882bcd , query-7d9a1b64c045)', (done)->
+    search_Text = 'owasp'
+    query_Id    = 'search-owasp___query-d43fe5882bcd'
+    filters     = 'query-7ff5431f1878'
+
+    using new Query_Tree(), ->
+      @.get_Query_Tree_Filtered query_Id, filters,(query_Tree)=>
+        query_Tree.id.assert_Is query_Id
+        console.log query_Tree.results
+        query_Tree.results.assert_Size_Is 8
+        query_Tree.containers.assert_Size_Is 0 #15
+        #query_Tree.filters.assert_Size_Is 3
+        done()
+
 
 
   it 'Open all Index queries ',   ()->                                      # takes 183ms to create, 84ms from cache

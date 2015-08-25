@@ -116,6 +116,9 @@ describe '| services | data | Query-View-Model', ->
         console.log data
         done()
 
+  it.only 'get_View_Model', (done)->
+
+    done()
 
 #  it 'query_Tree_from_GraphDB', (done)->
 #    query_Id = 'query-2416c5861783'  # 'Authorization' query
@@ -168,50 +171,50 @@ describe '| services | data | Query-View-Model', ->
       @.query_Tree_Cache_Key(null      ).assert_Is 'query_tree_null.json'
 
 
-  add_To_Cached_Query_Tree_Filtered = (id, title, containers, articles, filters)->
-    using new Query_View_Model(), ->
-
-      search_Data =
-        id        : id
-        title     : title
-        containers: containers
-        results   : articles
-        filters   : filters
-      key = @.query_Tree_Cache_Key(id)
-      @.cache.put key, search_Data
-
-  create_Search_Queries = ->
-    containers =
-      [
-        {
-          "id": "search-abc-a14e68cb74b3",
-          "title": "Administrative Controls",
-          "size": 1,
-          "articles": [
-            "article-cd025261450d"
-          ]
-        } ]
-
-    filters = []
-
-    #filters.push  title: 'Technology', results: [ { "id": "query-8c511380a4f5", "title": ".NET", "size": 1 , articles: [ "article-c1fda766a7f8"] }, { "id": "query-7d9a1b64c045", "title": "Java"  , "size": 75 , "articles": [ "article-56b13408793d","article-675c7336a2e8"] } ] ,
-    filters.push  title: 'Technology' ,results: [ { "id": "query-8c511380a4f5", "title": ".NET",  "size": 1 , articles: [ "article-c1fda766a7f8"] } , { "id": "query-7d9a1b64c045", "title": "Java"  , "size": 75 } ]
-    filters.push  title: 'Phase'     , results: [ { "id": "query-28b25f1c32d5", "title": "Deployment", "size": 6 , articles: [ "article-c1fda766a7f8"] }, { "id": "query-7ff5431f1878", "title": "Design"    , "size": 19 }]
-
-    #console.log filters
-
-    articles = [ { id: 'article-f19862f736d4' , title: 'How to Test for Server-Side Code Injection in Java', summary: 'summary goes here', type: "Checklist Item", phase: "Implementation", "technology": "Java" }
-                 { id: 'article-9cff045cc1c4' , title: 'Directory Browsing Is Disabled'                    , summary: 'another goes here', type: "Guideline"     , phase: "Implementation", "technology": "Java" }]
-
-    add_To_Cached_Query_Tree_Filtered 'search-abc', 'Search ABC 2', containers, articles , filters
-
-    add_To_Cached_Query_Tree_Filtered 'search-abc-a14e68cb74b3', 'Administrative Controls', [], articles , filters
-
-  it 'Test dynamic search results', (done)->
-    using new Query_View_Model(), ->
-      create_Search_Queries()
-      search_Id = 'search-abc'
-      filters     = "query_7d9a1b64c045"
-      @.query_Tree_Filtered search_Id, filters, (data)=>
-        console.log data
-        done()
+#  add_To_Cached_Query_Tree_Filtered = (id, title, containers, articles, filters)->
+#    using new Query_View_Model(), ->
+#
+#      search_Data =
+#        id        : id
+#        title     : title
+#        containers: containers
+#        results   : articles
+#        filters   : filters
+#      key = @.query_Tree_Cache_Key(id)
+#      @.cache.put key, search_Data
+#
+#  create_Search_Queries = ->
+#    containers =
+#      [
+#        {
+#          "id": "search-abc-a14e68cb74b3",
+#          "title": "Administrative Controls",
+#          "size": 1,
+#          "articles": [
+#            "article-cd025261450d"
+#          ]
+#        } ]
+#
+#    filters = []
+#
+#    #filters.push  title: 'Technology', results: [ { "id": "query-8c511380a4f5", "title": ".NET", "size": 1 , articles: [ "article-c1fda766a7f8"] }, { "id": "query-7d9a1b64c045", "title": "Java"  , "size": 75 , "articles": [ "article-56b13408793d","article-675c7336a2e8"] } ] ,
+#    filters.push  title: 'Technology' ,results: [ { "id": "query-8c511380a4f5", "title": ".NET",  "size": 1 , articles: [ "article-c1fda766a7f8"] } , { "id": "query-7d9a1b64c045", "title": "Java"  , "size": 75 } ]
+#    filters.push  title: 'Phase'     , results: [ { "id": "query-28b25f1c32d5", "title": "Deployment", "size": 6 , articles: [ "article-c1fda766a7f8"] }, { "id": "query-7ff5431f1878", "title": "Design"    , "size": 19 }]
+#
+#    #console.log filters
+#
+#    articles = [ { id: 'article-f19862f736d4' , title: 'How to Test for Server-Side Code Injection in Java', summary: 'summary goes here', type: "Checklist Item", phase: "Implementation", "technology": "Java" }
+#                 { id: 'article-9cff045cc1c4' , title: 'Directory Browsing Is Disabled'                    , summary: 'another goes here', type: "Guideline"     , phase: "Implementation", "technology": "Java" }]
+#
+#    add_To_Cached_Query_Tree_Filtered 'search-abc', 'Search ABC 2', containers, articles , filters
+#
+#    add_To_Cached_Query_Tree_Filtered 'search-abc-a14e68cb74b3', 'Administrative Controls', [], articles , filters
+#
+#  it.only 'Test dynamic search results', (done)->
+#    using new Query_View_Model(), ->
+#      create_Search_Queries()
+#      search_Id = 'search-abc'
+#      filters     = "query_7d9a1b64c045"
+#      @.query_Tree_Filtered search_Id, filters, (data)=>
+#        console.log data
+#        done()

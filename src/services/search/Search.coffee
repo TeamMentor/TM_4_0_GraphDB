@@ -15,23 +15,15 @@ class Search
     text = text.lower()
 
     @.search_Text.words_Score text, (results)=>
-
       article_Ids = (result.id for result in results)
+      query_Id    = @.query_Id_From_Text(text)
+      title       = text
+      cache_Key   = @.search_Query_Tree.cache_Key(query_Id, null)
 
+      @.search_Query_Tree.create_Query_Tree_For_Articles query_Id, title, cache_Key, article_Ids, (query_Tree)=>
+        callback query_Id, query_Tree
 
-      query_Id  = @.query_Id_From_Text(text)
-      title     = text
-      cache_Key = @.search_Query_Tree.cache_Key(query_Id, null)
-
-      @.search_Query_Tree.create_Query_Tree_For_Articles query_Id, title, cache_Key, article_Ids, (query_Tree)->
-        callback query_Id
-
-      #articles = @.map_Articles results
-      #filters = @.map_Filters(articles)
-
-      #@.add_To_Cached_Query_Tree_Filtered "search-#{text}", text, [],articles, filters
-
-      #callback('done')
-
+  for: (text, callback)=>
+    @.map_Search_Results_For_Text text, callback
 
 module.exports = Search

@@ -17,7 +17,7 @@ describe '| services | Search_Query_Tree', ->
       @.cache_Key('aa','bb').assert_Is 'query_tree_aa_bb.json'
       @.cache_Key(null,'bb').assert_Is 'query_tree_null_bb.json'
 
-  it 'create_Query_Tree_For_Articles', ->
+  it.only 'create_Query_Tree_For_Articles', ->
     using new Search_Query_Tree(),->
       article_Id = "article-fc9facd5e6ff"
       article    = @.search_Data.article(article_Id)
@@ -32,7 +32,21 @@ describe '| services | Search_Query_Tree', ->
           @.id   .assert_Is query_Id
           @.title.assert_Is query_Title
           @.results.first().id.assert_Is article_Id
+          @.containers.first().articles.assert_Is [article_Id]
+
         @.data_Cache.has_Key(cache_Key).assert_Is_True()
+
+  it.only 'create_Child_Queries_Using_Articles', (done)->
+    using new Search_Query_Tree(),->
+      article_Ids = ["article-fc9facd5e6ff"]
+      query_Id    = 'search-test'
+      query_Title = 'an search test'
+      cache_Key   = @.cache_Key(query_Id)
+      @.create_Query_Tree_For_Articles query_Id, query_Title, cache_Key, article_Ids, (query_Tree)=>
+        using query_Tree.containers[0], ->
+          @._original_id.assert_Is_String()
+          @.id.assert_Is "#{query_Id}___#{@._original_id}"
+          done()
 
   it 'map_Queries_For_Query', ->
     query_Id = 'query-4440ee60b313'

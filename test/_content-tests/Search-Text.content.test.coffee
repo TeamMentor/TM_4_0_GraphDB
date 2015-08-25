@@ -2,7 +2,7 @@ require 'fluentnode'
 
 Search_Text = require './../../src/services/search/Search-Text'
 
-describe.only '| _content-tests | Search-Text.content', ->
+describe '| _content-tests | Search-Text.content', ->
 
   it 'words_Score (SQL Injection)', (done)->
     using new Search_Text(), ->

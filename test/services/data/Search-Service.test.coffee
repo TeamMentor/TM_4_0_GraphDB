@@ -1,7 +1,7 @@
 Search_Service = require '../../../src/services/data/Search-Service'
 Query_Tree     = require '../../../src/services/query-tree/Query-Tree'
 
-describe.only '| services | data | Search-Service.test |', ->
+describe '| services | data | Search-Service.test |', ->
 
   options       = null
   searchService = null

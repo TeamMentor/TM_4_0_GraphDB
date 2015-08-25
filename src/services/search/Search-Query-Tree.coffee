@@ -1,5 +1,6 @@
 {Cache_Service} = require('teammentor')
 Search_Data     = require './Search-Data'
+async           = require 'async'
 
 # this creates the query-tree objects which are then used by the main index ui
 class Search_Query_Tree
@@ -36,7 +37,38 @@ class Search_Query_Tree
     articles    = @.map_Articles article_Ids
     containers  = @.map_Queries article_Ids
     filters     = @.map_Filters article_Ids
-    callback @.save_Query_Tree query_Id, title, containers, articles, filters, cache_Key
+
+    @.create_Child_Queries_From_Queries query_Id, containers, =>
+    #@.create_Child_Queries_From_Queries query_Tree, (updated_Query_Tree)->
+      query_Tree  = @.save_Query_Tree query_Id, title, containers, articles, filters, cache_Key
+      callback query_Tree
+
+
+
+  # this creates one query per child query using its articles as the base
+  create_Child_Queries_From_Queries: (query_Id, queries, callback)->
+
+
+    create_From_Query = (query, next)=>
+
+      console.log "[create_From_Query] for " + query.id
+
+      child_Id    = "#{query_Id}___#{query.id}"
+      title       = query.title
+      cache_Key   = @.cache_Key(child_Id, null)
+      article_Ids = query.articles
+
+      articles    = @.map_Articles article_Ids
+      containers  = []
+      filters     = @.map_Filters article_Ids
+      @.save_Query_Tree child_Id, title, containers, articles, filters, cache_Key
+
+      query._original_id = query.id
+      query.id = child_Id
+      next()
+
+    async.eachSeries queries, create_From_Query, ->
+      callback()
 
   map_Articles: (article_Ids)=>
     articles = []
@@ -65,8 +97,9 @@ class Search_Query_Tree
 
           id   = root_Query.query_Id
           title = root_Query.query_Title
-          queries[id] ?= { id: id, title: title,  size: 0 }
+          queries[id] ?= { id: id, title: title,  size: 0 , articles: []}
           queries[id].size++
+          queries[id].articles.push article_Id
 
     return queries.values()
 
@@ -128,8 +161,8 @@ class Search_Query_Tree
       containers: containers
       results   : articles
       filters   : filters
-
-    @.data_Cache.put key, query_Tree
+    if query_Id and articles?.size()
+      @.data_Cache.put key, query_Tree
     return query_Tree
 
   sort_Filter: (filter)->
@@ -193,7 +226,7 @@ class Search_Query_Tree
       for container in query_Tree.containers
         container.size = 0
         for result in filtered_Tree.results
-          if container.articles.contains(result.id)
+          if container.articles?.contains(result.id)
             container.size++
 
     if query_Tree.filters
@@ -205,6 +238,8 @@ class Search_Query_Tree
               filter_Result.size++
 
     filtered_Tree.title = query_Tree.title
+    filtered_Tree.size  = filtered_Tree.results.size()
+
     callback filtered_Tree
 
 module.exports = Search_Query_Tree

@@ -1,6 +1,6 @@
 Query_View_Model = require '../../src/services/data/Query-View-Model'
 
-describe.only '| _content-tests | Query-View-Model.content', ->
+describe '| _content-tests | Query-View-Model.content', ->
 
   it 'get_View_Model (query-9cbfa10fee54, query-b439376de44c)', ()->
   using new Query_View_Model(), ->
@@ -39,6 +39,16 @@ describe.only '| _content-tests | Query-View-Model.content', ->
           @.filters.Phase     .assert_Is [ { "id": "query-66ed61faad6b", "title": "Implementation", "size": 9 } ]
           @.filters.Type      .assert_Is [ { "id": "query-766d8a5e743e", "title": "Checklist Item", "size": 5 }, { "id": "query-454a626d5266", "title": "Guideline", "size": 4 } ]
           done()
+
+
+  it 'query_view_model (search-owasp , query-7d9a1b64c045)', (done)->
+    using new Query_View_Model(), ->
+      query_Id = 'search-owasp'
+      filters  = 'query-7d9a1b64c045'
+      @.get_View_Model query_Id, filters, 0,2,(view_Model)=>
+        assert_Is_Undefined view_Model.id
+        done()
+
 
   it 'Query_View_Model for all Index queries ',   ()->                                             # takes 498 ms to create, 366 ms from cache
     using new Query_View_Model(), ->

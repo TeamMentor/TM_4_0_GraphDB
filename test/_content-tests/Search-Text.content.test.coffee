@@ -18,7 +18,7 @@ describe '| _content-tests | Search-Text.content', ->
         @.words_Score 'JAVA', (results_2)->
           results_1.assert_Size_Is 473
           results_1.size().assert_Is results_2.size()
-          results_1[0].assert_Is results_2[0]
+          results_1[0].assert_Is_Not results_2[0]
           done()
 
   it 'words_Score (.NET)', (done)->

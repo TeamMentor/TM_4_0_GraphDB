@@ -1,14 +1,20 @@
 Query_View_Model = require '../../../src/services/data/Query-View-Model'
 
-describe '| services | data | Query-View-Model', ->
+describe.only '| services | data | Query-View-Model', ->
 
   it 'constructor', ->
     using new Query_View_Model(), ->
-      @.options           .assert_Is {}
-      @.cache             .cacheFolder().assert_Folder_Exists()
+      @.options          .assert_Is {}
+      @.data_Cache       .constructor.name.assert_Is 'CacheService'
       @.search_Query_Tree.constructor.name.assert_Is 'Search_Query_Tree'
-      #@.db_Name      .assert_Is 'tm-uno'
-      #@.graph_Options.assert_Is name : 'tm-uno'
+      @.data_Cache       .cacheFolder().assert_Folder_Exists()
+
+  it 'cache_Key', ->
+    using new Query_View_Model(), ->
+      @.cache_Key('a','b' ,'c' ,'d' ).assert_Is 'query_view_model_a_b_c_d.json'
+      @.cache_Key('a',''  ,'c' ,'d' ).assert_Is 'query_view_model_a_c_d.json'
+      @.cache_Key('a',null,'c' ,'d' ).assert_Is 'query_view_model_a_c_d.json'
+      @.cache_Key('a',null,null,null).assert_Is 'query_view_model_a_null_null.json'
 
   it 'get_Articles', (done)->
     query_Id = 'query-2416c5861783'  # 'Authorization' query
@@ -86,10 +92,25 @@ describe '| services | data | Query-View-Model', ->
           @.queries.assert_Size_Is 6
           done()
 
+  it 'get_View_Model (from Cache)', (done)->
+    query_Id = 'query-2416c5861783'  # 'Authorization' query
+    filters = ''
+    from    = 0
+    to      = 10
+    using new Query_View_Model(), ->
+      cache_Key = @.cache_Key query_Id, filters, from, to
+      @.data_Cache.delete cache_Key
+      @.data_Cache.has_Key(cache_Key).assert_Is_False()
+      @.get_View_Model query_Id, filters, from, to, (view_Model)=>
+        view_Model._query_id.assert_Is query_Id
+        view_Model._cache_Key.assert_Is cache_Key
+        @.data_Cache.has_Key(cache_Key).assert_Is_True()
+        done()
+
   it 'get_View_Model (bad query)', (done)->
     using new Query_View_Model(), ->
       @.get_View_Model 'aaaa1234', null, null, null, (view_Model)->
-        view_Model.assert_Is cache_Key: 'query_tree_aaaa1234.json'
+        view_Model.assert_Is error: 'no query tree filtered'
         done()
 
   it 'query_Tree_Filtered', (done)->
@@ -100,25 +121,21 @@ describe '| services | data | Query-View-Model', ->
         data.id.assert_Is query_Id
         done()
 
-  it 'query_Tree_Filtered_from_Cache', (done)->
-    query_Id = 'query-2416c5861783'  # 'Authorization' query
-    filters = ''
-    using new Query_View_Model(), ->
-      @.query_Tree_Filtered_from_Cache query_Id, filters, (data)->
-        data.id.assert_Is query_Id
-        done()
+#  it 'query_Tree_Filtered_from_Cache', (done)->
+#    query_Id = 'query-2416c5861783'  # 'Authorization' query
+#    filters = ''
+#    using new Query_View_Model(), ->
+#      @.query_Tree_Filtered_from_Cache query_Id, filters, (data)->
+#        data.id.assert_Is query_Id
+#        done()
 
-  it 'query_Tree_Filtered_from_Query_Id', (done)->
-    query_Id = 'query-2416c5861783'  # 'Authorization' query
-    filters = ''
-    using new Query_View_Model(), ->
-      @.query_Tree_Filtered_from_Query_Id query_Id, filters, (data)->
-        console.log data
-        done()
-
-  it.only 'get_View_Model', (done)->
-
-    done()
+#  it 'query_Tree_Filtered_from_Query_Id', (done)->
+#    query_Id = 'query-2416c5861783'  # 'Authorization' query
+#    filters = ''
+#    using new Query_View_Model(), ->
+#      @.query_Tree_Filtered_from_Query_Id query_Id, filters, (data)->
+#        console.log data
+#        done()
 
 #  it 'query_Tree_from_GraphDB', (done)->
 #    query_Id = 'query-2416c5861783'  # 'Authorization' query
@@ -163,12 +180,12 @@ describe '| services | data | Query-View-Model', ->
 
 
   # search stuff
-  it 'query_Tree_Cache_Key', ->
-    using new Query_View_Model(), ->
-      @.query_Tree_Cache_Key('aa'      ).assert_Is 'query_tree_aa.json'
-      @.query_Tree_Cache_Key('aa', null).assert_Is 'query_tree_aa.json'
-      @.query_Tree_Cache_Key('aa','bb' ).assert_Is 'query_tree_aa_bb.json'
-      @.query_Tree_Cache_Key(null      ).assert_Is 'query_tree_null.json'
+#  it 'query_Tree_Cache_Key', ->
+#    using new Query_View_Model(), ->
+#      @.query_Tree_Cache_Key('aa'      ).assert_Is 'query_tree_aa.json'
+#      @.query_Tree_Cache_Key('aa', null).assert_Is 'query_tree_aa.json'
+#      @.query_Tree_Cache_Key('aa','bb' ).assert_Is 'query_tree_aa_bb.json'
+#      @.query_Tree_Cache_Key(null      ).assert_Is 'query_tree_null.json'
 
 
 #  add_To_Cached_Query_Tree_Filtered = (id, title, containers, articles, filters)->

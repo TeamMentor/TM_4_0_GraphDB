@@ -1,5 +1,7 @@
 {Cache_Service} = require('teammentor')
 
+memory_Cache = {}
+
 class Search_Data
   constructor: (options)->
     @.options       = options || {}
@@ -13,10 +15,11 @@ class Search_Data
     @.key_Tags_Mappings        = 'tags_mappings.json'
 
   get_Data: (key_Name)->
-    if @.cache.has_Key(key_Name)
-      @.cache.get(key_Name)?.json_Parse()
-    else
-      {}
+    if not memory_Cache[key_Name]
+      if @.cache.has_Key(key_Name)
+        memory_Cache[key_Name] = @.cache.get(key_Name)?.json_Parse()
+
+    memory_Cache[key_Name] || {}
 
   article             : (article_Id) => @.get_Data(@.key_Articles)[article_Id]
 

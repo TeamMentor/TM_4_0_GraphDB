@@ -1,16 +1,18 @@
 {Cache_Service} = require('teammentor')
-#Import_Service  = require './Import-Service'
 Search_Query_Tree= require '../search/Search-Query-Tree'
 Query_Tree       = require '../query-tree/Query-Tree'
 
 class Query_View_Model
   constructor: (options)->
     @.options           = options || {}
-    @.cache             = @.options.cache || new Cache_Service("data_cache")
+
+    @.data_Cache        = @.options.cache || new Cache_Service("data_cache")
     @.search_Query_Tree = new Search_Query_Tree()
     @.query_Tree        = new Query_Tree()
-    #@.db_Name       = @.options.db_Name || 'tm-uno'
-    #@.graph_Options = name: @.db_Name
+
+
+  cache_Key: (query_Id, filters, from, to)=>
+    "query_view_model_#{query_Id}#{if filters then '_'  else ''}#{filters || ''}_#{from}_#{to}.json"
 
   get_Articles: (query_Id, filters, from, to, callback)->
     @.query_Tree_Filtered query_Id, filters, (data)->
@@ -40,9 +42,15 @@ class Query_View_Model
       callback filters
 
   get_View_Model: (query_Id, filters, from, to, callback)=>
+
+    cache_Key = @.cache_Key query_Id, filters, from, to
+
+    if false and @.data_Cache.has_Key cache_Key
+      return callback @.data_Cache.get(cache_Key)?.json_Parse()
+
     @.query_Tree_Filtered query_Id, filters, (query_Tree)=>
-      if not query_Tree?.id or query_Tree.id isnt query_Id
-        return callback { cache_Key: @.query_Tree_Cache_Key(query_Id, filters) }
+      if query_Tree?.id isnt query_Id
+        return callback { error: 'no query tree filtered' }
 
       view_Model = {}
 
@@ -50,22 +58,21 @@ class Query_View_Model
         @.get_Filters query_Id, filters, (data_Filters)=>
           @.get_Queries query_Id, filters, (data_Queries)=>
             using view_Model, ->
-              @._filters = filters
-              @._from    = from
-              @._to      = to
-
-              @.id       = query_Tree.id
-              @.title    = query_Tree.title
-              @.size     = query_Tree.results?.size()
+              @._cache_Key = cache_Key
+              @._query_Id  = query_Tree?.id
+              @._filters   = filters
+              @._from      = from
+              @._to        = to
+              @.id         = query_Tree?.id
+              @.title      = query_Tree?.title
+              @.size       = query_Tree?.results?.size()
 
               @.queries  = data_Queries
               @.articles = data_Articles
               @.filters  = data_Filters
 
-              callback view_Model
-
-  query_Tree_Cache_Key: (query_Id, filters)=>
-    "query_tree_#{query_Id}#{if filters then '_'  else ''}#{filters || ''}.json"
+            @.data_Cache.put cache_Key, view_Model
+            callback view_Model
 
   query_Tree_Filtered: (query_Id, filters, callback)=>
     @.query_Tree.get_Query_Tree_Filtered query_Id, filters, callback

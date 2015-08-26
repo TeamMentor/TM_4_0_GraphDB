@@ -53,6 +53,14 @@ describe '| _content-tests | Query-Tree.content', ->
             @[2].assert_Is title: "Type","results":[{"id":"query-766d8a5e743e","title":"Checklist Item","size":5,"articles":["article-3b1c76cc63ca","article-2be0a8a337cf","article-bb4d49c5d472","article-9703ecf83706","article-b99c29a20f7b"]},{"id":"query-454a626d5266","title":"Guideline","size":4,"articles":["article-f3cb4117f676","article-c10b60e5c6a9","article-22493ddbbe9e","article-293c9784332d"]}]
 
 
+  it 'query_Tree (query-a14e68cb74b3)',   (done)->
+    query_Id = 'query-a14e68cb74b3'
+    using new Query_Tree(),->
+      @.get_Query_Tree query_Id, (query_Tree)->
+        using query_Tree,->
+          query_Tree.assert_Is {}  # this is wrong
+          console.log @
+          done()
 
   it 'query-tree (query-4440ee60b313), check results are in alphabetical order',->
     query_Id = 'query-4440ee60b313'
@@ -68,7 +76,7 @@ describe '| _content-tests | Query-Tree.content', ->
         titles[1].assert_Is 'Do Not Cache Results of Security Checks'
         titles[2].assert_Is 'Use Locks with Mutexes'
 
-  it.only 'query_tree_filtered (search-owasp , query-7d9a1b64c045)', (done)->
+  it 'query_tree_filtered (search-owasp , query-7d9a1b64c045)', (done)->
     search_Text = 'owasp'
     query_Id    = 'search-owasp'
     filters     = 'query-7d9a1b64c045'
@@ -81,7 +89,7 @@ describe '| _content-tests | Query-Tree.content', ->
         query_Tree.filters.assert_Size_Is 3
         done()
 
-  it.only 'query_tree_filtered (search-owasp___query-d43fe5882bcd , query-7d9a1b64c045)', (done)->
+  it 'query_tree_filtered (search-owasp___query-d43fe5882bcd , query-7d9a1b64c045)', (done)->
     search_Text = 'owasp'
     query_Id    = 'search-owasp___query-d43fe5882bcd'
     filters     = 'query-7ff5431f1878'
@@ -94,8 +102,6 @@ describe '| _content-tests | Query-Tree.content', ->
         query_Tree.containers.assert_Size_Is 0 #15
         #query_Tree.filters.assert_Size_Is 3
         done()
-
-
 
   it 'Open all Index queries ',   ()->                                      # takes 183ms to create, 84ms from cache
     using new Query_Tree(),->

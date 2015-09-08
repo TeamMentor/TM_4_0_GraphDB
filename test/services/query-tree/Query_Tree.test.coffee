@@ -1,6 +1,6 @@
 Query_Tree = require './../../../src/services/query-tree/Query-Tree'
 
-describe.only '| services | query-tree | Query-Tree', ->
+describe '| services | query-tree | Query-Tree', ->
   it 'construtor', ->
     using new Query_Tree(),->
       @.assert_Instance_Of Query_Tree

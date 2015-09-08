@@ -8,6 +8,8 @@ class Search_Text_Mappings
     @.key_Search_Words_All = 'search_words_all.json'
     @.key_Search_Words     = 'search_words.json'
     @.key_Search_Text_Data = 'search_text_data.json'
+    @.key_Query_Mappings   = 'query_mappings.json'
+    @.key_Articles         = 'articles.json'
 
   folder_Raw_Search_Data: ()=>
     if global.config
@@ -24,7 +26,20 @@ class Search_Text_Mappings
     else
       callback {}
 
-  # 'words to artiles' mappings used by the search algorithm
+  # 'text and titles to articles' mappings used by the search algorithm
+  get_Search_Text_Articles: (callback)=>
+    search_Data = {}
+    for article_Id, article of @.search_Cache.get(@.key_Articles)?.json_Parse()
+      key = article.title.lower().replace(/:/g, ' ').replace(/-/g, ' ')
+      search_Data[key] = { text: article.title, source: 'article-title', article_Ids:  [ article_Id]}
+
+    for query_Id, query_Data of @.search_Cache.get(@.key_Query_Mappings)?.json_Parse()
+      if query_Data.articles.size() > 0
+        search_Data[query_Data.title.lower()]  =  { text: query_Data.title, source: 'query-mapping',query_Id: query_Id,  article_Ids: query_Data.articles }
+
+    callback search_Data
+
+  # 'words to articles' mappings used by the search algorithm
   get_Search_Text_Data: (callback)=>                       # takes 10,421 ms to create and 789 ms from cache
     if @.search_Cache.has_Key @.key_Search_Text_Data
       callback @.search_Cache.get(@.key_Search_Text_Data)?.json_Parse()

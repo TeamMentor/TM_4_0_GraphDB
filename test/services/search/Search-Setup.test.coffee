@@ -14,6 +14,8 @@ describe 'Search-Setup', ->
       @.key_Article_Root_Queries.assert_Is 'article_Root_Queries.json'
       @.key_Query_Mappings      .assert_Is 'query_mappings.json'
       @.key_Query_Titles        .assert_Is 'query_titles.json'
+      @.key_Search_Text_Data    .assert_Is 'search_text_data.json'
+      @.key_Search_Text_Articles.assert_Is 'search_text_articles.json'
       @.key_Tags_Mappings       .assert_Is 'tags_mappings.json'
 
       @.cache             .cacheFolder().assert_Folder_Exists()
@@ -88,6 +90,20 @@ describe 'Search-Setup', ->
         @.cache.has_Key(@.key_Search_Text_Data).assert_Is_True()
         done()
 
+  it.only 'create_Search_Text_Articles', (done)->
+    using new Search_Setup(),->
+      @.cache.delete @.key_Search_Text_Articles
+      @.create_Search_Text_Articles (data)=>
+        console.log data
+        using data['administrative controls'], ->
+          @.text.assert_Is   'Administrative Controls'
+          @.source.assert_Is 'article-title'
+          @.articles.assert_Is ['article-0899cfd472a6']
+        words = (word for word of data)
+        console.log words.size()
+        words.assert_Size_Is_Bigger_Than 1000     # 11083
+        @.cache.has_Key(@.key_Search_Text_Articles).assert_Is_True()
+        done()
 
   it 'create_Tag_Mappings', (done)->
     using new Search_Setup(),->

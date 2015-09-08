@@ -12,6 +12,7 @@ class Search_Data
     @.key_Query_Mappings       = 'query_mappings.json'
     @.key_Query_Titles         = 'query_titles.json'
     @.key_Search_Text_Data     = 'search_text_data.json'
+    @.key_Search_Text_Articles = 'search_text_articles.json'
     @.key_Tags_Mappings        = 'tags_mappings.json'
 
   get_Data: (key_Name)->
@@ -29,6 +30,7 @@ class Search_Data
   query_Mappings      : => @.get_Data @.key_Query_Mappings
   query_Titles        : => @.get_Data @.key_Query_Titles
   search_Text_Data    : => @.get_Data @.key_Search_Text_Data
+  search_Text_Articles: => @.get_Data @.key_Search_Text_Articles
   tag_Mappings        : => @.get_Data @.key_Tags_Mappings
 
 

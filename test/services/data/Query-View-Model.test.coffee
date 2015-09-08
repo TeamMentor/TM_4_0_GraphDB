@@ -1,6 +1,6 @@
 Query_View_Model = require '../../../src/services/data/Query-View-Model'
 
-describe.only '| services | data | Query-View-Model', ->
+describe '| services | data | Query-View-Model', ->
 
   it 'constructor', ->
     using new Query_View_Model(), ->

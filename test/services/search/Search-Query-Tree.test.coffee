@@ -1,6 +1,6 @@
 Search_Query_Tree = require '../../../src/services/search/Search-Query-Tree'
 
-describe '| services | Search_Query_Tree', ->
+describe '| services | search | Search_Query_Tree', ->
   it 'constructor', ->
     using new Search_Query_Tree(),->
       @.assert_Is_Instance_Of Search_Query_Tree
@@ -17,7 +17,7 @@ describe '| services | Search_Query_Tree', ->
       @.cache_Key('aa','bb').assert_Is 'query_tree_aa_bb.json'
       @.cache_Key(null,'bb').assert_Is 'query_tree_null_bb.json'
 
-  it.only 'create_Query_Tree_For_Articles', ->
+  it 'create_Query_Tree_For_Articles', ->
     using new Search_Query_Tree(),->
       article_Id = "article-fc9facd5e6ff"
       article    = @.search_Data.article(article_Id)
@@ -36,7 +36,7 @@ describe '| services | Search_Query_Tree', ->
 
         @.data_Cache.has_Key(cache_Key).assert_Is_True()
 
-  it.only 'create_Child_Queries_Using_Articles', (done)->
+  it 'create_Child_Queries_Using_Articles', (done)->
     using new Search_Query_Tree(),->
       article_Ids = ["article-fc9facd5e6ff"]
       query_Id    = 'search-test'

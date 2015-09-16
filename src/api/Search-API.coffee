@@ -2,6 +2,7 @@
 Swagger_GraphDB       = require './base-classes/Swagger-GraphDB'
 #Search_Text_Service   = require '../services/text-search/Search-Text-Service'
 Search                = require '../services/search/Search'
+Search_Text_Mappings  = require '../services/search/Search-Text-Mappings'
 
 
 class Search_API extends Swagger_GraphDB
@@ -10,6 +11,10 @@ class Search_API extends Swagger_GraphDB
       @.options.area   = 'search'
       @.search         = new Search()
       super(@.options)
+
+    all_words: (req,res)=>
+      new Search_Text_Mappings().search_Words (words)->
+        res.send words
 
     article_titles: (req,res)=>                                             # used by TM_Website.Angular-Controller.get_Search_Auto_Complete
       @.using_Search_Service res, 'search_article_titles.json', (send)->
@@ -37,6 +42,8 @@ class Search_API extends Swagger_GraphDB
         @.query_From_Text_Search text, (data)->
           send data
 
+
+
     word_score: (req,res)=>
       word = req.params?.word?.lower() || ''
       new Search_Text_Service().word_Score word, (data)->
@@ -48,11 +55,12 @@ class Search_API extends Swagger_GraphDB
         res.send data.json_Pretty()
 
     add_Methods: ()=>
-
+      @.add_Get_Method 'all_words'
       @.add_Get_Method 'article_titles'
 #      @.add_Get_Method 'article_summaries'
       @.add_Get_Method 'query_titles'
       @.add_Get_Method 'query_from_text_search', ['text',]
+
       @.add_Get_Method 'word_score', ['word']
       @.add_Get_Method 'words_score', ['words']
       @

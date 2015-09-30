@@ -60,8 +60,8 @@ class Graph_Find
 
   find_Using_Is_and_Title: (is_value, title_value, callback)=>
     if @graph.db is null
-      callback null
-      return
+      return callback null
+
     @graph.db.nav(is_value).archIn('is').as('id')
                            .archOut('title').as('title')
                            .bind(title_value)

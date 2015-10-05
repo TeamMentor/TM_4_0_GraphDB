@@ -60,8 +60,8 @@ class Graph_Find
 
   find_Using_Is_and_Title: (is_value, title_value, callback)=>
     if @graph.db is null
-      callback null
-      return
+      return callback null
+
     @graph.db.nav(is_value).archIn('is').as('id')
                            .archOut('title').as('title')
                            .bind(title_value)
@@ -181,6 +181,11 @@ class Graph_Find
                            .solutions (err,data) ->
                               callback (item.query for item in data)
 
+
+  get_Articles_Data: (callback)=>
+    @.find_Using_Is 'Article', (articles_Ids)=>
+      @.get_Subjects_Data articles_Ids, callback
+
   get_Subject_Data: (subject, callback)=>
     if @graph.db is null
       callback null
@@ -206,8 +211,7 @@ class Graph_Find
 
   get_Subjects_Data:(subjects, callback)=>
     if @graph.db is null
-      callback null
-      return
+      return callback null
     result = {}
     if not subjects
       callback result
@@ -223,6 +227,8 @@ class Graph_Find
     async.each subjects, map_Subject_data, -> callback(result)
 
   find_Tags: (callback)=>
+    if @.graph.db is null
+      return callback {}
     @.graph.query 'predicate','tags', (data)=>
       tag_Data = {}
       if data

@@ -16,12 +16,11 @@ describe '| api | base-classes | Swagger-Common.test', ->
       @.swaggerService.assert_Is options.swaggerService
 
   it 'add_Get_Method (no params)', (done)->
-    area           = 'area'.add_5_Letters()
-    name           = 'name'.add_5_Letters()
+    area           = 'area_'.add_5_Letters()
+    name           = 'name_'.add_5_Letters()
     swaggerService =
       addGet: (get_Command)->
         get_Command.spec.assert_Is { path: "/#{area}/#{name}", nickname: name, parameters: [] },
-        get_Command.action.source_Code().assert_Contains 'return _this[name](req, res);'
         done()
     options =  { area:area, swaggerService}
     using new Swagger_Common(options), ->
@@ -55,7 +54,6 @@ describe '| api | base-classes | Swagger-Common.test', ->
                               "required": true
                               "type": "string"
                             } ]
-        get_Command.action.source_Code().assert_Contains 'return _this[name](req, res);'
         done()
 
     options =  { area:area, swaggerService}

@@ -1,4 +1,7 @@
+return
 
+# This code ended up being quite expensive from a DB query point og view
+# replaced initially by Search-Query-Tree
 class Query_Tree
 
   constructor: (import_Service)->
@@ -35,7 +38,7 @@ class Query_Tree
           container =
             id      : query?.id
             title   : query?.title
-            size    : query?.articles.size()
+            size    : query?.articles?.size()
             articles: query?.articles
 
           query_Tree.containers.add container
@@ -83,27 +86,36 @@ class Query_Tree
 
       callback filters
 
+  get_Query_Tree_Filtered: (query_Id, filters, callback)=>
+    @.get_Query_Tree query_Id, (query_Tree)=>
+      if not filters
+        callback query_Tree
+      else
+        @.apply_Query_Tree_Query_Id_Filter query_Tree, filters, callback
+
   apply_Query_Tree_Query_Id_Filter: (query_Tree, query_Ids, callback)=>
     @.import_Service.query_Mappings.get_Queries_Mappings (queries_Mappings)=>
 
       articles = []
+      if query_Ids
+        for query_Id in query_Ids.split(',')
 
-      for query_Id in query_Ids.split(',')
-
-        filter_Query     = queries_Mappings[query_Id]
-        if filter_Query
-          if articles.empty()
-            articles = filter_Query.articles
-          else
-            articles = (article for article in articles when article in filter_Query.articles)
+          filter_Query     = queries_Mappings[query_Id]
+          if filter_Query
+            if articles.empty()
+              articles = filter_Query.articles
+            else
+              articles = (article for article in articles when article in filter_Query.articles)
 
 
       if articles.empty()
-        return callback {} #query_Tree
+        return callback {}
 
       @.apply_Query_Tree_Articles_Filter query_Tree, articles, callback
 
   apply_Query_Tree_Articles_Filter: (query_Tree, articles, callback)=>
+      if not query_Tree
+        return callback {}
 
       filtered_Tree =
         id         : query_Tree.id

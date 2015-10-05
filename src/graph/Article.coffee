@@ -19,8 +19,8 @@ class Article
     @.article_Id_To_Guid article_id, (guid)=>
       #console.log "getting html for:" + article_id
       if(guid)
-        html_File = @.folder_Articles_Html().path_Combine "#{guid.substring(0,2)}/#{guid}.html"
-        if html_File.file_Exists()
+        html_File = @.folder_Articles_Html()?.path_Combine "#{guid.substring(0,2)}/#{guid}.html"
+        if html_File?.file_Exists()
           return callback html_File.file_Contents()
 
       callback null

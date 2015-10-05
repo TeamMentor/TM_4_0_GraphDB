@@ -99,8 +99,10 @@ describe '| api | base-classes | Swagger-GraphDB.test | open_Import_Service', ->
     swagger_DB = new Swagger_GraphDB(options)
 
   afterEach (done)->
-    importService.graph.deleteDb ->
+    if importService
+      importService.graph.deleteDb ->
         done()
+    else done()
 
   it 'sending data not in cache', (done)->
 

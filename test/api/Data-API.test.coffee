@@ -1,5 +1,6 @@
 TM_Server        = require '../../src/TM-Server'
 Swagger_Service  = require '../../src/services/rest/Swagger-Service'
+Swagger_Service  = require '../../src/services/rest/Swagger-Service'
 Data_API         = require '../../src/api/Data-API'
 
 describe '| api | Data-API.test', ->
@@ -9,7 +10,7 @@ describe '| api | Data-API.test', ->
     clientApi      = null
     dataApi      = null
 
-    before (done)->
+    beforeEach (done)->
       port     = 10000 + 10000.random()
       tmServer = new TM_Server({ port : port}).configure()
       options  = { app: tmServer.app ,  port : tmServer.port}
@@ -24,7 +25,7 @@ describe '| api | Data-API.test', ->
           clientApi = swaggerApi
           done()
 
-    after (done)->
+    afterEach (done)->
       tmServer.stop ->
         done()
 
@@ -46,8 +47,8 @@ describe '| api | Data-API.test', ->
           done()
 
     it 'article', (done)->
-      clientApi.articles (article_Ids)->
-        article_Id = article_Ids.obj.keys().first()
+      clientApi.articles (articles)->
+        article_Id = articles.obj.keys().first()
         article_Id.assert_Contains 'article-'
         clientApi.article {ref: article_Id}, (data)->
           data.obj.article_Id.assert_Is article_Id
@@ -96,6 +97,7 @@ describe '| api | Data-API.test', ->
         clientApi.id {id: article_Id }, (data)->
           data.obj[article_Id].assert_Is(article)
           done()
+
 
     it 'library_Query', (done)->
       clientApi.library_Query (data)->
@@ -159,6 +161,13 @@ describe '| api | Data-API.test', ->
         #data.obj.keys().assert_Size_Is_Bigger_Than 10
         done()
 
+    it 'tags', (done)->
+      clientApi.tags  (tags_Data)=>
+        tags_Data.keys().assert_Not_Empty()
+        tags_Data.values().assert_Not_Empty()
+        done()
+
+
     it 'query_tree', (done)->
       clientApi.root_queries (data)=>
         root_Queries = data.obj
@@ -173,7 +182,7 @@ describe '| api | Data-API.test', ->
       clientApi.root_queries (data)=>
         root_Queries = data.obj
         #query_Id = root_Queries.queries.second().id
-        query_Id = 'query-9580060e39dc'# Create Temporary Files Carefully
+        query_Id = 'query-9580060e39dc'   # Create Temporary Files Carefully
         filters  = ''
         clientApi.query_tree {id: query_Id, filters: filters }, (data)=>
           size_No_Filters = data.obj.results.size()
@@ -201,15 +210,35 @@ describe '| api | Data-API.test', ->
           filter_Query_Id = "query-10db76a18a35,query-1320f210feae" #WCF,Implementation
           filters         = filter_Query_Id
           clientApi.query_tree_filtered {id: query_Id, filters: filters }, (data)=>
-            #log result_Filter_1.size
             done()
 
-    it 'tags', (done)->
-      clientApi.tags  (tags_Data)=>
-        tags_Data.keys().assert_Not_Empty()
-        tags_Data.values().assert_Not_Empty()
-        done()
+    it 'query_view_model_filtered', (done)->
+      query_Id = 'query-2416c5861783'  # 'Authorization' query
+      from    = 0
+      to      = 10
+      clientApi.query_view_model id: query_Id, from: from, to: to, (data)->
+        using data.obj, ->
+          @._filters .assert_Is ''
+          @._from    .assert_Is from
+          @._to      .assert_Is to
+          @.articles.assert_Size_Is to - from
+          @.filters.keys().assert_Is ['Technology', 'Phase', 'Type']
+          @.queries.assert_Size_Is 6
+          done()
 
-
+    it 'query_view_model_filtered', (done)->
+      query_Id = 'query-2416c5861783'  # 'Authorization' query
+      filters = 'query-8c511380a4f5'   # '.NET' filter
+      from    = 0
+      to      = 10
+      clientApi.query_view_model_filtered id: query_Id, filters: filters, from: from, to: to, (data)->
+        using data.obj, ->
+          @._filters .assert_Is filters
+          @._from    .assert_Is from
+          @._to      .assert_Is to
+          @.articles.assert_Size_Is to - from
+          @.filters.keys().assert_Is ['Technology', 'Phase', 'Type']
+          @.queries.assert_Size_Is 6
+          done()
 
 

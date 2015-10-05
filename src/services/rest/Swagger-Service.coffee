@@ -72,7 +72,7 @@ class Swagger_Service
     api_Url = @.url_Api_Docs.append("/#{apiName}")
 
     onSuccess  = ()    -> callback(swaggerApi[apiName])
-    onFailure  = (data)-> "API Call Failed".log();log data
+    onFailure  = (data)-> "API Call Failed".log(); log data
     onProgress = (data)-> #log data
     options    = { url: api_Url, success:onSuccess, failure: onFailure, progress: onProgress }
 

@@ -4,6 +4,9 @@ describe '| services | utils | Logging-Service.test |', ->
 
   logging_Service = null
 
+  if(console.log?.source_Code() isnt "function () { [native code] }")     # console.log is already hooked by somebody else
+    return
+
   before ->
     logging_Service = new Logging_Service().setup()
 

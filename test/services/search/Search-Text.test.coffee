@@ -1,27 +1,30 @@
-return
+Search_Text = require './../../../src/services/search/Search-Text'
 
-Search_Text_Service = require './../../../src/services/text-search/Search-Text-Service'
-
-describe '| services | text-search | Search-Text-Service', ->
+describe '| services | text-search | Search-Text..', ->
 
   search_Text = null
 
   before (done)->
-    search_Text = new Search_Text_Service()
+    search_Text = new Search_Text()
     done()
 
-  it 'folder_Search_Data', ()->
-    search_Text.folder_Search_Data().assert_Folder_Exists()
+  it 'constructor', ->
+    using new Search_Text(),->
+      @.options.assert_Is {}
+      @.cache_Search.constructor.name.assert_Is 'CacheService'
+      @.search_Data .constructor.name.assert_Is 'Search_Data'
 
   it 'search_Mappings', (done)->
-    @timeout 10000
     search_Text.search_Mappings (data)->
-      data.assert_Is_Object()
+      data.assert_Is_Not {}
+      words = (word for word of data)
+      words.assert_Size_Is_Bigger_Than 11000
       done()
 
   it 'tag_Mappings', (done)->
     search_Text.tag_Mappings (data)->
       data.assert_Is_Object()
+      data.keys().assert_Size_Is 21
       done()
 
   it 'word_Data', (done)->
@@ -29,8 +32,8 @@ describe '| services | text-search | Search-Text-Service', ->
       results.keys().assert_Not_Empty()
       done()
 
+
   it 'word_Score', (done)->
-    @.timeout 5000
     search_Text.word_Score 'injection', (results)->
     #search_Text.word_Score 'wcf 3.5', (results)->
       results.assert_Not_Empty()
@@ -41,10 +44,13 @@ describe '| services | text-search | Search-Text-Service', ->
       done()
 
   it 'words_Score', (done)->
-    search_Text.words_Score 'sQL   injection', (results)->
-    #search_Text.words_Score 'wcf 3.5', (results)->
-      results.assert_Not_Empty()
-      done()
+    search_Text.words_Score 'sQL   injECTion', (results_1)->
+      search_Text.words_Score 'SQL Injection', (results_2)->
+        search_Text.words_Score 'sql injection', (results_3)->
+          results_1.assert_Not_Empty()
+          results_1.assert_Is results_2
+          results_1.assert_Is results_3
+          done()
 
   it 'words_List ', (done)->
     search_Text.words_List (words)->
@@ -68,29 +74,4 @@ describe '| services | text-search | Search-Text-Service', ->
               score = (item.score for item in result).reduce (previous, next)-> previous+next
               data = { word: word, articles: result.size(), score: score }
               all_Data.push data
-
-        #uncomment to see stats
-        #log '\n**** top100_By_Score ***\n'
-
-        #results_By_Score    = all_Data.sort (a,b)-> a.score - b.score
-        #results_By_Score.reverse()
-        #top100_By_Score    = results_By_Score.slice(0,100)
-        #log (item.word for item in top100_By_Score).join(', ')
-
-        #log top100_By_Score
-        #log '\n**** top100_By_Article ***\n'
-
-        #results_By_Articles = all_Data.sort (a,b)-> a.articles - b.articles
-        #results_By_Articles.reverse()
-        #top100_By_Articles = results_By_Articles.slice(0,100)
-        #log top100_By_Articles
-        #log (item.word for item in top100_By_Articles).join(', ')
-
         done()
-
-  #it 'tags_List ', (done)->
-  #  search_Text.tags_List (tags)->
-  #    #log tags
-  #    #words.assert_Bigger_Than 100
-  #    "there are #{tags.size()} unique tags".log()
-  #    done()

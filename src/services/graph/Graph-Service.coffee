@@ -3,6 +3,7 @@ levelgraph      = null
 GitHub_Service  = null
 async           = require 'async'
 path            = require 'path'
+domain          = require 'domain'
 
 class Graph_Service
 
@@ -33,12 +34,14 @@ class Graph_Service
     else
       locked = true
       process.nextTick =>
+        console.log '***[Graph-Service]*** open db'
         @.ensure_TM_Uno_Is_Loaded =>
           @.db = levelgraph(levelup(@dbPath))
           process.nextTick =>
             callback true
 
   closeDb: (callback)=>
+    console.log '***[Graph-Service]*** close db'
     if (@db)
       @db.close =>
         @db    = null
@@ -57,18 +60,38 @@ class Graph_Service
     tries = @.db_Lock_Tries
     delay = @.db_Lock_Delay
     check_Lock = =>
-      console.log "checking lock: #{tries} : #{locked}"
       if locked is true
         if tries
+          console.log "checking lock: #{tries}"
           tries--
           delay.wait =>
             process.nextTick =>
               check_Lock()
         else
+          console.log "[wait_For_Unlocked_DB] failed to get a lock after : #{@.db_Lock_Tries}"
           callback_Fail()
       else
         callback_Ok()
     check_Lock()
+
+  exec_In_DB: (action, callback)=>
+    exec_Domain = domain.create()                  # create a domain to execute 'action' function
+    exec_Domain.on 'error', (er)=>                 # catch errors thrown inside 'action'
+      console.log('[exec_In_DB][async error]', er) # log the error
+      @.closeDb =>                                 # ensure the db is closed
+        callback null                              # send back an null value
+
+    exec_Domain.run () =>                          # start the domain (which will catch any async exceptions)
+      @.openDb (status)=>                          # open the DB
+        if not status                              # if DB can't be opened
+          return callback null                     # send back an null value
+
+        action (data)=>                            # call 'action' function
+          @.closeDb =>                             # close db
+            callback(data)                         # send back data received
+
+
+
 
   # Refactor move to different file
 
@@ -92,9 +115,9 @@ class Graph_Service
       return callback()
     path_Lib_Uno_Flag = @.lib_Loaded_Flag
     path_Lib_Uno_Json = @.lib_UNO_Json
-    path_Graph_data   = @.lib_UNO_Json.path_Combine('Graph_Data')
+    path_Graph_data   = @.lib_UNO_Json?.path_Combine('Graph_Data')
 
-    if path_Lib_Uno_Json.folder_Not_Exists()
+    if (not path_Lib_Uno_Json) or path_Lib_Uno_Json.folder_Not_Exists()
       log "[ensure_TM_Uno_Is_Loaded] ERROR: Lib_Uno-json folder not found : #{path_Lib_Uno_Json}"
       return callback()
 

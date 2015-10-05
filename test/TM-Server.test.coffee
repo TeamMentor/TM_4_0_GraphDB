@@ -15,14 +15,30 @@ describe '| test-Server |',->
     server = new TM_Server({ port : port} ).configure()
 
   it 'check ctor', ->
-      expect(TM_Server     ).to.be.an('function')
-      expect(server        ).to.be.an('object'  )
-      expect(server.app    ).to.be.an('function')
-      expect(server.port   ).to.be.an('number'  )
-      expect(server._server).to.equal(null)
+    using new TM_Server(),->
+      @.options.assert_Is {}
+      @.app.constructor.name.assert_Is 'EventEmitter'
+      @.port.assert_Is_Number()
+      @.search_Setup.constructor.name.assert_Is 'Search_Setup'
+      @.log_All_Requests.assert_Is_True()
+      assert_Is_Null @._server
+      assert_Is_Null @.logging_Service
 
-      #expect(server.addRoutes    ).to.be.an('function')
-      #expect(server.addControlers).to.be.an('function')
+      @.enable_Logging  .assert_Is_Function()
+      @.run_Search_Setup.assert_Is_Function()
+      @.start           .assert_Is_Function()
+      @.stop            .assert_Is_Function()
+      @.url             .assert_Is_Function()
+      @.routes          .assert_Is_Function()
+
+  it 'search_Setup', (done)=>
+    using new TM_Server(),->
+      @.search_Setup.cache.delete @.search_Setup.key_Article_Root_Queries
+      @.search_Setup.cache.has_Key(@.search_Setup.key_Article_Root_Queries).assert_Is_False()
+      @.run_Search_Setup =>
+        @.search_Setup.cache.has_Key(@.search_Setup.key_Article_Root_Queries).assert_Is_True()
+        done()
+
 
   it 'start and stop', (done)->
       expect(server.start  ).to.be.an('function')
@@ -42,10 +58,9 @@ describe '| test-Server |',->
 
             server.stop ->
                 request server.url(), (error, response,data)->
-                    expect(error        ).to.not.equal(null)
-                    expect(error.message).to.equal('connect ECONNREFUSED')
-                    expect(response     ).to.equal(undefined)
-                    done()
+                  error.message.assert_Contains 'connect ECONNREFUSED'
+                  assert_Is_Undefined response
+                  done()
 
   it 'url',->
       expect(server.url()).to.equal("http://localhost:#{port}")

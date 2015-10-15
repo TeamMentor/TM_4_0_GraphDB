@@ -177,7 +177,7 @@ class Search_Query_Tree
     filter
 
   sort_Queries: (queries)->
-    titles = (query.title.lower() for query in queries).sort()
+    titles = (query.title?.lower?() for query in queries).sort()
 
     sorted_Queries = []
     for title in titles

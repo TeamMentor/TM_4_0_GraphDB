@@ -51,7 +51,7 @@ class Search_Query_Tree
 
     create_From_Query = (query, next)=>
 
-      console.log "[create_From_Query] for " + query.id
+      #console.log "[create_From_Query] for " + query.id
 
       child_Id    = "#{query_Id}___#{query.id}"
       title       = query.title

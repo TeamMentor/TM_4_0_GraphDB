@@ -1,6 +1,6 @@
 Query_View_Model = require '../../src/services/data/Query-View-Model'
 
-describe.only '| _content-tests | Query-View-Model.content', ->
+describe '| _content-tests | Query-View-Model.content', ->
 
 
   it 'get_View_Model (query-9cbfa10fee54, query-b439376de44c)', ()->
@@ -50,7 +50,7 @@ describe.only '| _content-tests | Query-View-Model.content', ->
         view_Model.size.assert_Is 29
         done()
 
-  it.only 'get_View_Model', (done)->
+  it 'get_View_Model', (done)->
     using new Query_View_Model(), ->
       query_Index = "query-6234f2d47eb7"
       @.get_View_Model query_Index, null, 0,2,(view_Model)=>

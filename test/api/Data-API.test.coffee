@@ -18,12 +18,13 @@ describe '| api | Data-API.test', ->
       swaggerService.set_Defaults()
 
       dataApi = new Data_API({swaggerService: swaggerService}).add_Methods()
+
       swaggerService.swagger_Setup()
       tmServer.start()
 
       swaggerService.get_Client_Api 'data', (swaggerApi)->
-          clientApi = swaggerApi
-          done()
+        clientApi = swaggerApi
+        done()
 
     afterEach (done)->
       tmServer.stop ->
@@ -68,12 +69,12 @@ describe '| api | Data-API.test', ->
         done()
 
     it 'article_Html', (done)->
-      clientApi.articles (article_Ids)->
-        article_Id = 'article-2d7d10704b0e'
-        clientApi.article_Html {id: article_Id}, (data)->
-          data.obj.html.assert_Contains('<p>')
-                       .assert_Contains('SQL Injection')
-          done()
+      #clientApi.articles (article_Ids)->
+      article_Id = 'article-2d7d10704b0e'
+      clientApi.article_Html {id: article_Id}, (data)->
+        data.obj.html.assert_Contains('<p>')
+                     .assert_Contains('SQL Injection')
+        done()
 
     it 'article_parent_queries', (done)->
       clientApi.articles (data)->

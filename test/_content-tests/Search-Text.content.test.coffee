@@ -29,3 +29,10 @@ describe '| _content-tests | Search-Text.content', ->
           results_1.size().assert_Is results_2.size()
           results_1.assert_Is results_2
           done()
+
+
+  it 'words_Score (cwe-22)', (done)->
+    using new Search_Text(), ->
+      @.words_Score 'cwe-22', (results)->
+        console.log results
+        done()

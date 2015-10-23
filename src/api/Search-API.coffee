@@ -33,26 +33,19 @@ class Search_API extends Swagger_GraphDB
       @.search.map_Search_Results_For_Text text, (query_Id)->
         res.json query_Id
 
-      return
-      #
-
-      #key =  "search_query_from_text_search_#{text}.json"
-      key = null #
-      @.using_Search_Service res, key, (send)->
-        @.query_From_Text_Search text, (data)->
-          send data
 
 
 
     word_score: (req,res)=>
       word = req.params?.word?.lower() || ''
-      new Search_Text_Service().word_Score word, (data)->
-        res.send data.json_Pretty()
+      new Search().search_Text.word_Score word, (data)->
+        res.send data
 
     words_score: (req,res)=>
       words = req.params?.words || ''
-      new Search_Text_Service().words_Score words, (data)->
-        res.send data.json_Pretty()
+      new Search().search_Text.words_Score words, (data)->
+        res.send data
+
 
     add_Methods: ()=>
       @.add_Get_Method 'all_words'

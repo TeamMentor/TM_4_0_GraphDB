@@ -1,6 +1,6 @@
 Search_Data = require '../../../src/services/search/Search-Data'
 
-describe 'Search-Data', ->
+describe '| services | search | Search-Data', ->
   it 'constructor', ->
     using new Search_Data(),->
       @.assert_Is_Instance_Of Search_Data

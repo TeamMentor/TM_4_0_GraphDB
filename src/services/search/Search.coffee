@@ -11,11 +11,17 @@ class Search
     "search-#{text.trim().to_Safe_String()}"
 
   map_Articles_For_Text: (text, callback)=>
-
     filtered_Text        = text.lower().replace(/:/g, ' ').replace(/-/g, ' ')
     search_Text_articles = @.search_Text.search_Data.search_Text_Articles()
 
-    map_Using_Fill_Title = (next)=>
+    map_Using_Lower_Title = (next)=>
+      data = search_Text_articles[text.lower()]
+      if data
+        callback text, data.article_Ids
+      else
+        next()
+
+    map_Using_Filtered_Title = (next)=>
       data = search_Text_articles[filtered_Text]
       if data
         callback text, data.article_Ids
@@ -37,9 +43,10 @@ class Search
         articles_Ids = articles_Ids.concat search_Text_articles[key].article_Ids
       callback text, articles_Ids
 
-    map_Using_Fill_Title =>
-      map_Using_Words_Search =>
-        map_Using_Partial_Title()
+    map_Using_Lower_Title =>
+      map_Using_Filtered_Title =>
+        map_Using_Words_Search =>
+          map_Using_Partial_Title()
 
 
   map_Search_Results_For_Text: (text, callback)=>

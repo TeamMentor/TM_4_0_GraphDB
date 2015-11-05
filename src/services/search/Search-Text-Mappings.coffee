@@ -31,7 +31,11 @@ class Search_Text_Mappings
     search_Data = {}
     for article_Id, article of @.search_Cache.get(@.key_Articles)?.json_Parse()
       key = article.title.lower().replace(/:/g, ' ').replace(/-/g, ' ')
-      search_Data[key] = { text: article.title, source: 'article-title', article_Ids:  [ article_Id]}
+      if search_Data[key]?                            # there might be articles with the same title (e.g cross site scripting)
+        search_Data[key]?.article_Ids?.push(article_Id)
+      else
+        search_Data[key] = { text: article.title, source: 'article-title', article_Ids:  [ article_Id]}
+
 
     for query_Id, query_Data of @.search_Cache.get(@.key_Query_Mappings)?.json_Parse()
       if query_Data.articles.size() > 0

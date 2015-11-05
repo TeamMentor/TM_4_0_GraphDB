@@ -57,7 +57,7 @@ describe '| services | search | Search-Text-Mappings ', ->
         search_Text_Articles[key].assert_Is_Not_Null()
         search_Text_Articles[key].source.assert_Is('article-title')
         search_Text_Articles[key].article_Ids.assert_Is_Not_Null()
-        search_Text_Articles[key].article_Ids.size().assert_Is 4    #4 articles foe cross site scripting
+        search_Text_Articles[key].article_Ids.size().assert_Is 4    #4 articles for cross site scripting
         done()
 
   it 'search_Text_Articles (cross site request forgery)', (done)->
@@ -67,5 +67,5 @@ describe '| services | search | Search-Text-Mappings ', ->
         search_Text_Articles[key].assert_Is_Not_Null()
         search_Text_Articles[key].source.assert_Is('article-title')
         search_Text_Articles[key].article_Ids.assert_Is_Not_Null()
-        search_Text_Articles[key].article_Ids.size().assert_Is 4    #4 articles foe cross site scripting
+        search_Text_Articles[key].article_Ids.size().assert_Is 4    #4 articles for cross site request forgery
         done()

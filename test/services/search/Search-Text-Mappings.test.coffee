@@ -49,3 +49,23 @@ describe '| services | search | Search-Text-Mappings ', ->
         words = (word for word of search_Text_Data)
         words.assert_Size_Is_Bigger_Than 11000     # 11083
         done()
+
+  it 'search_Text_Articles (Cross Site Scripting)', (done)->
+    key        = "cross site scripting";
+    using new Search_Text_Mappings(), ->
+      @.get_Search_Text_Articles (search_Text_Articles)=>
+        search_Text_Articles[key].assert_Is_Not_Null()
+        search_Text_Articles[key].source.assert_Is('article-title')
+        search_Text_Articles[key].article_Ids.assert_Is_Not_Null()
+        search_Text_Articles[key].article_Ids.size().assert_Is 4    #4 articles for cross site scripting
+        done()
+
+  it 'search_Text_Articles (cross site request forgery)', (done)->
+    key        = "cross site request forgery";
+    using new Search_Text_Mappings(), ->
+      @.get_Search_Text_Articles (search_Text_Articles)=>
+        search_Text_Articles[key].assert_Is_Not_Null()
+        search_Text_Articles[key].source.assert_Is('article-title')
+        search_Text_Articles[key].article_Ids.assert_Is_Not_Null()
+        search_Text_Articles[key].article_Ids.size().assert_Is 4    #4 articles for cross site request forgery
+        done()

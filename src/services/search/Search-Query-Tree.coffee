@@ -51,7 +51,7 @@ class Search_Query_Tree
 
     create_From_Query = (query, next)=>
 
-      console.log "[create_From_Query] for " + query.id
+      #console.log "[create_From_Query] for " + query.id
 
       child_Id    = "#{query_Id}___#{query.id}"
       title       = query.title
@@ -177,7 +177,7 @@ class Search_Query_Tree
     filter
 
   sort_Queries: (queries)->
-    titles = (query.title.lower() for query in queries).sort()
+    titles = (query.title?.lower?() for query in queries).sort()
 
     sorted_Queries = []
     for title in titles

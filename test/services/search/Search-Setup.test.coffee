@@ -1,6 +1,6 @@
 Search_Setup = require '../../../src/services/search/Search-Setup'
 
-describe 'Search-Setup', ->
+describe '| services | search | Search-Setup', ->
   it 'constructor', ->
     using new Search_Setup(),->
       @.assert_Is_Instance_Of Search_Setup
@@ -90,19 +90,27 @@ describe 'Search-Setup', ->
         @.cache.has_Key(@.key_Search_Text_Data).assert_Is_True()
         done()
 
-  it.only 'create_Search_Text_Articles', (done)->
+  it 'create_Search_Text_Articles (query-title)', (done)->
     using new Search_Setup(),->
       @.cache.delete @.key_Search_Text_Articles
       @.create_Search_Text_Articles (data)=>
-        console.log data
         using data['administrative controls'], ->
-          @.text.assert_Is   'Administrative Controls'
-          @.source.assert_Is 'article-title'
-          @.articles.assert_Is ['article-0899cfd472a6']
+          @.text.assert_Is   'Administrative Controls' #Administrative Controls'
+          @.source.assert_Is 'query-mapping'
+          @.article_Ids.assert_Size_Is 27
         words = (word for word of data)
-        console.log words.size()
         words.assert_Size_Is_Bigger_Than 1000     # 11083
         @.cache.has_Key(@.key_Search_Text_Articles).assert_Is_True()
+        done()
+
+  it 'create_Search_Text_Articles (article-title)', (done)->
+    using new Search_Setup(),->
+      @.cache.delete @.key_Search_Text_Articles
+      @.create_Search_Text_Articles (data)=>
+        using data['asp.net security'], ->
+          @.text.assert_Is   'ASP.NET Security'
+          @.source.assert_Is 'article-title'
+          @.article_Ids.assert_Is ['article-0a47af09d657']
         done()
 
   it 'create_Tag_Mappings', (done)->

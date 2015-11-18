@@ -55,7 +55,7 @@ class Search_Text
               score = 1
               switch tag
                 when 'title'
-                  score = 30
+                  score = 45
                 when 'h1'
                   score = 5
                 when 'h2'
@@ -68,19 +68,24 @@ class Search_Text
                   score = -4
                 when 'span'
                   score = 0
-
               result.score += score * occurences
               result.why[tag]?=0
               result.why[tag]+=score
+
+            for article in tag_Mappings['checklist item']
+              if (article == article_Id)
+                result.score = result.score - 20
+                break
             results.push result
+
 
         add_Tag_Mappings = (key)=>
           if tag_Mappings[key]
             tag_Articles = tag_Mappings[key]
             for result in results
               if tag_Articles.contains?(result.id)
-                result.score += 30
-                result.why.tag = 30
+                result.score +=  45
+                result.why.tag = 45
                 tag_Articles.splice tag_Articles.indexOf(result.id),1
 
             for article_Id in tag_Articles
@@ -89,23 +94,22 @@ class Search_Text
 
         add_Results_Mappings word
         add_Tag_Mappings word
-
         results = (results.sort (a,b)-> a.score - b.score).reverse()
-
         callback results
 
   words_Score: (words, callback)=>
     words = words.lower()
     results = {}
-
     @word_Score words, (result)=>
       if result.not_Empty()
+        article_Ids = (r for r in result)
         return callback result
-
       get_Score = (word,next)=>
         if word is ''
           return next()
+
         @word_Score word , (word_Results)->
+          article_Ids = (result.id for result in word_Results)
           results[word] = word_Results
           next()
 
@@ -130,12 +134,12 @@ class Search_Text
         for word,word_Data of id_Data
           result.score +=  word_Data.score
           result.why[word] = word_Data.why
+          result.occurences = word_Data.occurences
+
         results.push result
 
     #log results
-
     results = (results.sort (a,b)-> a.score - b.score).reverse()
-
     callback results
 
   words_List: (callback)=>

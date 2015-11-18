@@ -134,8 +134,6 @@ class Search_Text
         for word,word_Data of id_Data
           result.score +=  word_Data.score
           result.why[word] = word_Data.why
-          result.occurences = word_Data.occurences
-
         results.push result
 
     #log results

@@ -73,10 +73,6 @@ class Search_Text
               result.why[tag]?=0
               result.why[tag]+=score
 
-            for article in tag_Mappings['checklist item']?
-              if (article == article_Id)
-                result.score = result.score - 20
-                break
             results.push result
 
 

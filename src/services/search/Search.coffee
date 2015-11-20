@@ -11,6 +11,7 @@ class Search
     @.Exact_Title_Match_Score          = 80    #map_Using_Lower_Title
     @.Filtered_Title_Score             = 70    #map_Using_Filtered_Title
     @.Partial_Title_Score              = 50    #map_Using_Partial_Title
+    @.CheckList_Decrement_Score        = 20    #Score will be decremented on 20 if it is a checklist
     @.Technology_Independent_Query     = 'query-99baeab17b26'
 
   query_Id_From_Text: (text)=>
@@ -20,6 +21,7 @@ class Search
     filtered_Text        = text.lower().replace(/:/g, ' ').replace(/-/g, ' ')
     search_Text_articles = @.search_Text.search_Data.search_Text_Articles()
     query_Mappings       = @.search_Text.search_Data.query_Mappings()
+    tag_Mappings         = @.search_Text.search_Data.tag_Mappings()
     @.articles           = []
 
     return callback text, {} if !filtered_Text.trim()
@@ -59,7 +61,11 @@ class Search
       for article in @.articles
         if technologyIndependent?.indexOf(article.id) > -1
           article.score += @.Technology_Independent_Increment;
+        if tag_Mappings?['checklist item']?.indexOf(article.id) > -1
+          article.score -= @.CheckList_Decrement_Score
+
       data = (@.articles.sort (a,b) -> a.score - b.score).reverse()
+
       article_Ids = (result.id for result in data)
       return callback text, article_Ids
 
@@ -75,9 +81,8 @@ class Search
         article = article?.split("|")?.first()
 
       result = @.articles?.filter((result) -> result.id == article)[0] #finding duplicated articles
-
       if result?
-        result.score+= parseInt(score)
+        result.score = result.score + parseInt(score)
       else
         searchResult = {id: article, score : parseInt(score)}
         @.articles.push(searchResult)

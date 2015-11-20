@@ -17,6 +17,7 @@ class Search_Text
     @.options             = options || {}
     @.cache_Search        = new Cache_Service("search_cache")
     @.search_Data         = new Search_Data()
+    @.tag_Score           = 45 #Score assigned to tag articles
 
   search_Mappings: (callback)=>
     if loaded_Search_Mappings is null
@@ -72,7 +73,7 @@ class Search_Text
               result.why[tag]?=0
               result.why[tag]+=score
 
-            for article in tag_Mappings['checklist item']
+            for article in tag_Mappings['checklist item']?
               if (article == article_Id)
                 result.score = result.score - 20
                 break
@@ -84,12 +85,12 @@ class Search_Text
             tag_Articles = tag_Mappings[key]
             for result in results
               if tag_Articles.contains?(result.id)
-                result.score +=  45
-                result.why.tag = 45
+                result.score +=  @.tag_Score
+                result.why.tag = @.tag_Score
                 tag_Articles.splice tag_Articles.indexOf(result.id),1
 
             for article_Id in tag_Articles
-              result = {id : article_Id, score: 30, why: {tag:30}}
+              result = {id : article_Id, score: @.tag_Score, why: {tag:@.tag_Score}}
               results.push result
 
         add_Results_Mappings word

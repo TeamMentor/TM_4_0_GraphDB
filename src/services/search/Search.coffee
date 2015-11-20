@@ -13,6 +13,7 @@ class Search
     @.Partial_Title_Score              = 50    #map_Using_Partial_Title
     @.CheckList_Decrement_Score        = 20    #Score will be decremented on 20 if it is a checklist
     @.Technology_Independent_Query     = 'query-99baeab17b26'
+    @.Checklist_Query                  = 'query-cab5946af82b'
 
   query_Id_From_Text: (text)=>
     "search-#{text.trim().to_Safe_String()}"
@@ -21,7 +22,7 @@ class Search
     filtered_Text        = text.lower().replace(/:/g, ' ').replace(/-/g, ' ')
     search_Text_articles = @.search_Text.search_Data.search_Text_Articles()
     query_Mappings       = @.search_Text.search_Data.query_Mappings()
-    tag_Mappings         = @.search_Text.search_Data.tag_Mappings()
+
     @.articles           = []
 
     #Search string must be greater than 1 char an it must not be an empty string
@@ -46,6 +47,7 @@ class Search
           @.add_Search_Results(article_Ids)
         next()
 
+    # todo: This method as to be refactored, it is very complex and the parsing logic should be done in other functions.
     map_Using_Partial_Title =(next)=>
       articles_Ids = []
       keys = (key for key in search_Text_articles.keys() when key.contains(filtered_Text))
@@ -57,12 +59,14 @@ class Search
       return callback text, {} if @.articles?.length == 0
 
       # If article is a Technology Independent, then it increases the score in 10
-      technologyIndependent = query_Mappings?[@.Technology_Independent_Query]?.articles;
+      technologyIndependent = query_Mappings?[@.Technology_Independent_Query]?.articles
+      checklistMappings     = query_Mappings?[@.Checklist_Query]?.articles
 
       for article in @.articles
-        if technologyIndependent?.indexOf(article.id) > -1
+        if technologyIndependent?.indexOf(article.id) > -1    #If article is Technology Independent, score is incremented
           article.score += @.Technology_Independent_Increment;
-        if tag_Mappings?['checklist item']?.indexOf(article.id) > -1
+
+        if checklistMappings?.indexOf(article.id) > -1       #If the article is Checklist, score is decremented
           article.score -= @.CheckList_Decrement_Score
 
       data = (@.articles.sort (a,b) -> a.score - b.score).reverse()

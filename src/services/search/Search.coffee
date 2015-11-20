@@ -22,6 +22,7 @@ class Search
     query_Mappings       = @.search_Text.search_Data.query_Mappings()
     @.articles           = []
 
+    return callback text, {} if !filtered_Text.trim()
 
     map_Using_Lower_Title = (next)=>
       data = search_Text_articles[text.lower()]
@@ -47,19 +48,20 @@ class Search
       keys = (key for key in search_Text_articles.keys() when key.contains(filtered_Text))
       for key in keys
         articles_Ids = articles_Ids.concat search_Text_articles[key].article_Ids
-        @.add_Search_Results(articles_Ids,@.Partial_Title_Score)
 
-      if @.articles?.length == 0
-        return callback text, {}
-      else
-        # If article is a Technology Independent, then it increases the score in 10
-        technologyIndependent = query_Mappings?[@.Technology_Independent_Query]?.articles;
-        for article in @.articles
-          if technologyIndependent?.indexOf(article.id) > -1
-            article.score += @.Technology_Independent_Increment;
-        data = (@.articles.sort (a,b) -> a.score - b.score).reverse()
-        article_Ids = (result.id for result in data)
-        return callback text, article_Ids
+      @.add_Search_Results(articles_Ids,@.Partial_Title_Score)
+
+      return callback text, {} if @.articles?.length == 0
+
+      # If article is a Technology Independent, then it increases the score in 10
+      technologyIndependent = query_Mappings?[@.Technology_Independent_Query]?.articles;
+
+      for article in @.articles
+        if technologyIndependent?.indexOf(article.id) > -1
+          article.score += @.Technology_Independent_Increment;
+      data = (@.articles.sort (a,b) -> a.score - b.score).reverse()
+      article_Ids = (result.id for result in data)
+      return callback text, article_Ids
 
     map_Using_Lower_Title =>
       map_Using_Filtered_Title =>
@@ -72,14 +74,12 @@ class Search
         score   = article?.split("|")?.last()
         article = article?.split("|")?.first()
 
-      searchResult = {id: article, score : parseInt(score)}
+      result = @.articles?.filter((result) -> result.id == article)[0] #finding duplicated articles
 
-      result = @.articles?.filter((result) -> #finding existing records to increment score
-        result.id == article
-      )[0]
       if result?
-        result.score = parseInt(result.score) + parseInt(score)
+        result.score+= parseInt(score)
       else
+        searchResult = {id: article, score : parseInt(score)}
         @.articles.push(searchResult)
 
   map_Search_Results_For_Text: (text, callback)=>

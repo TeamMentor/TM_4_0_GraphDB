@@ -24,7 +24,8 @@ class Search
     tag_Mappings         = @.search_Text.search_Data.tag_Mappings()
     @.articles           = []
 
-    return callback text, {} if !filtered_Text.trim()
+    #Search string must be greater than 1 char an it must not be an empty string
+    return callback text, {} if !filtered_Text.trim() || text.trim().length == 1
 
     map_Using_Lower_Title = (next)=>
       data = search_Text_articles[text.lower()]
@@ -88,6 +89,8 @@ class Search
         @.articles.push(searchResult)
 
   map_Search_Results_For_Text: (text, callback)=>
+
+
     @.map_Articles_For_Text text, (text_Searched, article_Ids)=>
       query_Id    = @.query_Id_From_Text(text_Searched)
       title       = text_Searched

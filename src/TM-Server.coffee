@@ -20,7 +20,6 @@ class TM_Server
         @.app.use(compress())
         @.app.get '/'    , (req,res) -> res.redirect 'docs'
         @.enable_Logging()
-        @.run_Search_Setup()  # Async actions
         @
 
     enable_Logging: =>
@@ -37,7 +36,9 @@ class TM_Server
         callback() if callback
 
     start: (callback)=>
-        @._server = @app.listen @port, ->
+      #refactoring this code so the search setup is done during the server startup. After cache files are created, server is started.
+       @.run_Search_Setup =>
+        @._server = @app.listen @port, =>
           callback() if callback
         @
 

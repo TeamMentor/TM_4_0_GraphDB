@@ -17,6 +17,7 @@ class Search_Text
     @.options             = options || {}
     @.cache_Search        = new Cache_Service("search_cache")
     @.search_Data         = new Search_Data()
+    @.tag_Score           = 45 #Score assigned to tag articles
 
   search_Mappings: (callback)=>
     if loaded_Search_Mappings is null
@@ -55,7 +56,7 @@ class Search_Text
               score = 1
               switch tag
                 when 'title'
-                  score = 30
+                  score = 45
                 when 'h1'
                   score = 5
                 when 'h2'
@@ -68,44 +69,44 @@ class Search_Text
                   score = -4
                 when 'span'
                   score = 0
-
               result.score += score * occurences
               result.why[tag]?=0
               result.why[tag]+=score
+
             results.push result
+
 
         add_Tag_Mappings = (key)=>
           if tag_Mappings[key]
             tag_Articles = tag_Mappings[key]
             for result in results
               if tag_Articles.contains?(result.id)
-                result.score += 30
-                result.why.tag = 30
+                result.score +=  @.tag_Score
+                result.why.tag = @.tag_Score
                 tag_Articles.splice tag_Articles.indexOf(result.id),1
 
             for article_Id in tag_Articles
-              result = {id : article_Id, score: 30, why: {tag:30}}
+              result = {id : article_Id, score: @.tag_Score, why: {tag:@.tag_Score}}
               results.push result
 
         add_Results_Mappings word
         add_Tag_Mappings word
-
         results = (results.sort (a,b)-> a.score - b.score).reverse()
-
         callback results
 
   words_Score: (words, callback)=>
     words = words.lower()
     results = {}
-
     @word_Score words, (result)=>
       if result.not_Empty()
+        article_Ids = (r for r in result)
         return callback result
-
       get_Score = (word,next)=>
         if word is ''
           return next()
+
         @word_Score word , (word_Results)->
+          article_Ids = (result.id for result in word_Results)
           results[word] = word_Results
           next()
 
@@ -133,9 +134,7 @@ class Search_Text
         results.push result
 
     #log results
-
     results = (results.sort (a,b)-> a.score - b.score).reverse()
-
     callback results
 
   words_List: (callback)=>

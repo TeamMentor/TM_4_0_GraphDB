@@ -46,7 +46,7 @@ class Swagger_GraphDB extends Swagger_Common
       if key and data                                     # check that both values are set
         if data instanceof Array and data.empty()         # if array, check if not empty
           return
-        if data instanceof Object and data.keys().empty?() # if object, check if not empty
+        if data instanceof Object and data.keys_Own().empty?() # if object, check if not empty
           return
         try
           @.cache.setup()                                   # ensures cache folder exists

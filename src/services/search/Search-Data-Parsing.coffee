@@ -13,7 +13,7 @@ class Search_Data_Parsing
   map_Article_Ids: (callback)=>
     if @.cache.has_Key(@.key_Articles) is false
       return callback null
-    callback @.cache.get(@.key_Articles)?.json_Parse().keys()
+    callback @.cache.get(@.key_Articles)?.json_Parse().keys_Own()
 
   map_Article_Root_Queries: (callback)=>
 

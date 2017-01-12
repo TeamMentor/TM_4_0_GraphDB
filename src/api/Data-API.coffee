@@ -155,7 +155,7 @@ class Data_API extends Swagger_GraphDB
     cache_Key = "tags.json"
     @.using_Graph_Find res, cache_Key, (send)->
       @.find_Tags (tags)=>
-        send tags.keys()
+        send tags.keys_Own()
 
   add_Methods: ()=>
     @add_Get_Method 'article'                   , ['ref']

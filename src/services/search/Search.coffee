@@ -50,7 +50,7 @@ class Search
     # todo: This method as to be refactored, it is very complex and the parsing logic should be done in other functions.
     map_Using_Partial_Title =(next)=>
       articles_Ids = []
-      keys = (key for key in search_Text_articles.keys() when key.contains(filtered_Text))
+      keys = (key for key in search_Text_articles.keys_Own() when key.contains(filtered_Text))
       for key in keys
         articles_Ids = articles_Ids.concat search_Text_articles[key].article_Ids
 

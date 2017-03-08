@@ -17,7 +17,7 @@ class Search_Text
     @.options             = options || {}
     @.cache_Search        = new Cache_Service("search_cache")
     @.search_Data         = new Search_Data()
-    @.tag_Score           = 45 #Score assigned to tag articles
+    @.tag_Score           = 50 #Score assigned to tag articles
 
   search_Mappings: (callback)=>
     if loaded_Search_Mappings is null
@@ -56,10 +56,14 @@ class Search_Text
               score = 1
               switch tag
                 when 'title'
-                  score = 45
+                  score = 35
                 when 'h1'
                   score = 5
                 when 'h2'
+                  score = 4
+                when 'h3'
+                  score = 4
+                when 'h4'
                   score = 4
                 when 'em'
                   score = 3
@@ -123,10 +127,10 @@ class Search_Text
     #log mapped_Scores
 
     results = []
-    words_Size =  scores.keys?().size()
+    words_Size =  scores.keys_Own?().size()
 
     for id, id_Data of mapped_Scores
-      if id_Data.keys?().size() is words_Size
+      if id_Data.keys_Own?().size() is words_Size
         result = {id: id, score:0 , why: {}}
         for word,word_Data of id_Data
           result.score +=  word_Data.score

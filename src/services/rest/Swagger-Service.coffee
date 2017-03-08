@@ -25,7 +25,7 @@ class Swagger_Service
     @.url_Api_Docs = @.server.append('/v1.0/api-docs')
 
   path_Swagger_UI: ()=>
-    for path in require.cache.keys()
+    for path in require.cache.keys_Own()
        if path.contains('swagger-node-express')
         return path.parent_Folder()
                    .path_Combine('swagger-ui')

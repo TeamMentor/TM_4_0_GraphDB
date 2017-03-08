@@ -63,7 +63,7 @@ class Query_Tree
           title  : filter_Title
           results: []
 
-        for query_Id in articles_Parent_Queries.queries.keys()
+        for query_Id in articles_Parent_Queries.queries.keys_Own()
           query = articles_Parent_Queries.queries[query_Id]
           if query.title is filter_Title
             for child_Query_Id in query.child_Queries

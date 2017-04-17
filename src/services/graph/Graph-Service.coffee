@@ -29,7 +29,7 @@ class Graph_Service
   openDb : (callback)=>
     if locked
       @.wait_For_Unlocked_DB (()=> @.openDb(callback)), ()->
-        "Error: [GraphDB] is in use".log()
+        console.log("Error: [GraphDB] is in use")
         callback false
     else
       locked = true
@@ -77,7 +77,7 @@ class Graph_Service
   exec_In_DB: (action, callback)=>
     exec_Domain = domain.create()                  # create a domain to execute 'action' function
     exec_Domain.on 'error', (er)=>                 # catch errors thrown inside 'action'
-      console.log('[exec_In_DB][async error]', er) # log the error
+      console.log('[exec_In_DB][async error]' + er) # log the error
       @.closeDb =>                                 # ensure the db is closed
         callback null                              # send back an null value
 
@@ -118,17 +118,17 @@ class Graph_Service
     path_Graph_data   = @.lib_UNO_Json?.path_Combine('Graph_Data')
 
     if (not path_Lib_Uno_Json) or path_Lib_Uno_Json.folder_Not_Exists()
-      log "[ensure_TM_Uno_Is_Loaded] ERROR: Lib_Uno-json folder not found : #{path_Lib_Uno_Json}"
+      console.log("[ensure_TM_Uno_Is_Loaded] ERROR: Lib_Uno-json folder not found : #{path_Lib_Uno_Json}")
       return callback()
 
     if path_Lib_Uno_Flag.file_Exists()
       return callback()
 
-    "[ensure_TM_Uno_Is_Loaded] Using path_To_Lib_Uno_Json: #{path_Lib_Uno_Json}".log()
-    "[ensure_TM_Uno_Is_Loaded] #{path_Lib_Uno_Flag.file_Name()} file doesn't exist, so deleting GraphDB and re-importing Lib_Uno-Json data".log()
+    console.log("[ensure_TM_Uno_Is_Loaded] Using path_To_Lib_Uno_Json: #{path_Lib_Uno_Json}")
+    console.log("[ensure_TM_Uno_Is_Loaded] #{path_Lib_Uno_Flag.file_Name()} file doesn't exist, so deleting GraphDB and re-importing Lib_Uno-Json data")
 
     @.deleteDb =>
-      '[ensure_TM_Uno_Is_Loaded] deleting data_cache and search_cache folders'.log()
+      console.log('[ensure_TM_Uno_Is_Loaded] deleting data_cache and search_cache folders')
       "#{@.tmCache}/data_cache".folder_Delete_Recursive()
       "#{@.tmCache}/search_cache".folder_Delete_Recursive()
 
@@ -136,10 +136,10 @@ class Graph_Service
 
       console.time('graph import')
       import_Data = (file, callback)=>
-        "[ensure_TM_Uno_Is_Loaded] Loading graph data from: #{file.file_Name()}".log()
+        console.log("[ensure_TM_Uno_Is_Loaded] Loading graph data from: #{file.file_Name()}")
         graph_Data = file.load_Json()
         if graph_Data and graph_Data.size
-          "[ensure_TM_Uno_Is_Loaded] There are #{graph_Data.size()} triplets to import".log()
+          console.log("[ensure_TM_Uno_Is_Loaded] There are #{graph_Data.size()} triplets to import")
           async.each graph_Data, @.db.put, callback
         else
           callback()

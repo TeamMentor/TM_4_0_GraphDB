@@ -7,11 +7,11 @@ class Search
     @.search_Text                      = new Search_Text()
     @.search_Query_Tree                = new Search_Query_Tree()
     @.articles                         = []
-    @.Technology_Independent_Increment = 10
+    @.Technology_Independent_Increment = 150
     @.Exact_Title_Match_Score          = 80    #map_Using_Lower_Title
     @.Filtered_Title_Score             = 70    #map_Using_Filtered_Title
     @.Partial_Title_Score              = 50    #map_Using_Partial_Title
-    @.CheckList_Decrement_Score        = 20    #Score will be decremented on 20 if it is a checklist
+    @.CheckList_Decrement_Score        = 150    #Score will be decremented on 150 if it is a checklist
     @.Technology_Independent_Query     = 'query-99baeab17b26'
     @.Checklist_Query                  = 'query-cab5946af82b'
 
@@ -50,7 +50,7 @@ class Search
     # todo: This method as to be refactored, it is very complex and the parsing logic should be done in other functions.
     map_Using_Partial_Title =(next)=>
       articles_Ids = []
-      keys = (key for key in search_Text_articles.keys() when key.contains(filtered_Text))
+      keys = (key for key in search_Text_articles.keys_Own() when key.contains(filtered_Text))
       for key in keys
         articles_Ids = articles_Ids.concat search_Text_articles[key].article_Ids
 

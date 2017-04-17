@@ -3,8 +3,8 @@ winston    = null
 class Logging_Service
 
   dependencies: ()->
-    winston    = require 'winston'
-
+    winston         = require 'winston'
+    DailyRotateFile = require 'winston-daily-rotate-file'
   constructor: (options)->
     @.dependencies()
     @.options          = options || {}
@@ -16,10 +16,10 @@ class Logging_Service
   setup: =>
     @.log_File = @.log_Folder.folder_Create().path_Combine('tm-graphDb')
 
-    @.logger = new (winston.Logger)
-
-    @.logger .add(   winston.transports.DailyRotateFile, {filename: @.log_File, datePattern: '.yyyy-MM-dd'})
-             .add(   winston.transports.Console        , { timestamp: true, level: 'verbose', colorize: true });
+    @.logger = new (winston.Logger)(transports: [
+      new  winston.transports.DailyRotateFile({ filename: @.log_File, datePattern: '.yyyy-MM-dd'})
+      new  winston.transports.Console({ timestamp: true, level: 'verbose', colorize: true })
+    ])
 
     @.hook_Console()
     @
@@ -30,12 +30,12 @@ class Logging_Service
       @.original_Console = console.log
       console.log        = (args...)=> @.info args...
       global.logger      = @
-      log '[Logging-Service] console hooked'
+      @.log '[Logging-Service] console hooked'
 
   restore_Console: =>
     if @.original_Console
       console.log = @.original_Console
-      log 'Console restored'
+      @.log 'Console restored'
 
   info: (data)=>
     @.logger.info data

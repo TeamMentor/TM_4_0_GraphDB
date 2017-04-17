@@ -9,7 +9,7 @@ class Queries
     @.import_Service.query_Mappings.get_Queries_Mappings (queries_Mappings)=>
       articles_Queries = {}
 
-      for query_Id in queries_Mappings.keys()
+      for query_Id in queries_Mappings.keys_Own()
         query = queries_Mappings[query_Id]
         for article_Id in  query.articles
           articles_Queries[article_Id] ?= []
@@ -27,7 +27,7 @@ class Queries
         @map_Article_Parent_Queries articles_Queries,queries_Mappings , result, article_Id
 
       #remove duplicate mappings
-      for key in result.queries.keys()
+      for key in result.queries.keys_Own()
         using result.queries[key],->
           @.articles       = @.articles      .unique()
           @.parent_Queries = @.parent_Queries.unique()
